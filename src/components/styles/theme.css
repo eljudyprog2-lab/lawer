@@ -1,0 +1,160 @@
+:root {
+  --brand-teal: #1e3a3c;
+  --brand-teal-deep: #152c2e;
+  --brand-teal-soft: #2a4f52;
+  --brand-teal-mid: #254648;
+  --brand-gold: #c4a35a;
+  --brand-gold-light: #d4b86e;
+  --brand-gold-dark: #a8893f;
+  --brand-gold-pale: #f3ead3;
+
+  --bg: #eef2f2;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-muted: #eef2f2;
+
+  --text: #3d4f50;
+  --text-h: #1e3a3c;
+  --text-muted: #6b7f80;
+  --text-on-teal: #f5f7f7;
+  --text-on-gold: #1e3a3c;
+
+  --border: #d5e0e0;
+  --border-strong: #b8c9c9;
+
+  --success: #2d8a5e;
+  --success-bg: #e8f6ef;
+  --danger: #c44545;
+  --info: #3a6ea5;
+  --info-bg: #eaf2fa;
+
+  --grad-gold: linear-gradient(135deg, #e0c878 0%, #c4a35a 45%, #a8893f 100%);
+  --grad-teal: linear-gradient(160deg, #2a4f52 0%, #1e3a3c 50%, #152c2e 100%);
+  --grad-teal-soft: linear-gradient(135deg, #355c5f 0%, #1e3a3c 100%);
+  --grad-surface: linear-gradient(165deg, #ffffff 0%, #f7faf9 55%, #f0f5f4 100%);
+  --grad-panel-header: linear-gradient(180deg, #f8fbfa 0%, #ffffff 100%);
+  --grad-page: linear-gradient(
+      145deg,
+      rgba(196, 163, 90, 0.14) 0%,
+      transparent 42%
+    ),
+    linear-gradient(320deg, rgba(30, 58, 60, 0.1) 0%, transparent 48%),
+    linear-gradient(180deg, #f5f8f8 0%, #e8eeee 100%);
+
+  --shadow-sm: 0 1px 3px rgba(30, 58, 60, 0.06);
+  --shadow-md: 0 10px 28px rgba(30, 58, 60, 0.1);
+  --shadow-lg: 0 18px 44px rgba(30, 58, 60, 0.14);
+  --shadow-gold: 0 10px 28px rgba(196, 163, 90, 0.28);
+  --shadow-teal: 0 10px 28px rgba(30, 58, 60, 0.22);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 999px;
+
+  --sidebar-width: 268px;
+  --header-height: 74px;
+
+  --font-display: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+  --font-body: 'IBM Plex Sans Arabic', 'Cairo', sans-serif;
+
+  --transition: 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-fast: 150ms ease;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  color: var(--text-h);
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--brand-gold-light), var(--brand-teal-soft));
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --sidebar-width: 0px;
+    --header-height: 60px;
+    font-size: 14px;
+  }
+}

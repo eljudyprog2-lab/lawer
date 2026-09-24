@@ -1,0 +1,17 @@
+/* Tailwind utilities only — skip preflight so existing app CSS stays intact */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #1e3a3c;
+  --color-brand-deep: #152c2e;
+  --color-brand-soft: #2a4f52;
+  --color-gold: #c4a35a;
+  --color-gold-light: #d4b86e;
+  --color-gold-pale: #f3ead3;
+}
+
+/* Global entry — remaining styles live in components/styles and load via DashboardLayout */

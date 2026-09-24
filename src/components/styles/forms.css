@@ -1,0 +1,687 @@
+/* Shared form / filter spacing — preserve existing look, fix consistency */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.field__error {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--danger, #c44545);
+  line-height: 1.35;
+}
+
+.field__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.field .input.is-invalid,
+.input.is-invalid {
+  border-color: rgba(196, 69, 69, 0.55);
+  box-shadow: 0 0 0 3px rgba(196, 69, 69, 0.12);
+}
+
+.field-grid {
+  gap: 0.9rem 1rem;
+}
+
+.form-section {
+  margin: 0;
+}
+
+.form-section + .form-section {
+  margin-top: 0.15rem;
+}
+
+.form-banner {
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(196, 69, 69, 0.25);
+  background: #fdeeee;
+  color: #a33333;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+/* Checkbox / radio rows */
+.field-check,
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0.15rem 0;
+  font-size: 0.9rem;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.field-check input[type='checkbox'],
+.field-check input[type='radio'],
+.checkbox-row input[type='checkbox'],
+.checkbox-row input[type='radio'] {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+  accent-color: var(--brand-teal);
+  cursor: pointer;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+/* Toolbar + filters spacing */
+.cases-page,
+.documents-page,
+.invoices-page,
+.appointments-page,
+.sessions-page {
+  gap: 1.15rem;
+}
+
+.cases-toolbar {
+  margin-bottom: 0;
+}
+
+/* Shared custom filter dropdown */
+.filter-select-wrap,
+.filter-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 148px;
+  max-width: 220px;
+  width: auto;
+  flex: 0 1 auto;
+  vertical-align: middle;
+}
+
+.filter-dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  min-width: 148px;
+  height: 42px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff 0%, #f8f6f1 100%);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: start;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    background var(--transition);
+}
+
+.filter-dropdown__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-dropdown__label.is-placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.filter-dropdown__chevron {
+  flex-shrink: 0;
+  color: #6b7f80;
+  transition:
+    color var(--transition),
+    transform 0.2s ease;
+}
+
+.filter-dropdown__trigger:hover {
+  border-color: rgba(196, 163, 90, 0.55);
+  background: #fff;
+}
+
+.filter-dropdown__trigger:hover .filter-dropdown__chevron {
+  color: var(--brand-gold-dark);
+}
+
+.filter-dropdown.is-open .filter-dropdown__trigger,
+.filter-dropdown__trigger:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.15);
+}
+
+.filter-dropdown.is-open .filter-dropdown__chevron {
+  color: var(--brand-gold-dark);
+  transform: rotate(180deg);
+}
+
+.filter-dropdown.is-disabled .filter-dropdown__trigger {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.filter-dropdown.is-invalid .filter-dropdown__trigger {
+  border-color: var(--danger);
+}
+
+.field .filter-dropdown,
+.modal .filter-dropdown,
+label .filter-dropdown,
+.sessions-filters .filter-dropdown,
+.appointments-filters .filter-dropdown {
+  width: 100%;
+  max-width: none;
+}
+
+.modal .filter-dropdown__trigger,
+.field .filter-dropdown__trigger {
+  min-height: auto;
+  height: auto;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.filter-dropdown__menu {
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  border: 1px solid rgba(196, 163, 90, 0.35);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow:
+    0 12px 28px rgba(30, 58, 60, 0.14),
+    0 2px 6px rgba(30, 58, 60, 0.06);
+  max-height: min(280px, 55vh);
+  overflow-y: auto;
+  animation: filter-dropdown-in 0.16s ease;
+}
+
+.filter-dropdown__menu:not(.filter-dropdown__menu--portal) {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 40;
+}
+
+@keyframes filter-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-dropdown__option {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.6rem 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.filter-dropdown__option:hover {
+  background: rgba(196, 163, 90, 0.12);
+  color: var(--brand-teal);
+}
+
+.filter-dropdown__option.is-active {
+  background: linear-gradient(135deg, rgba(196, 163, 90, 0.22), rgba(196, 163, 90, 0.12));
+  color: var(--brand-teal);
+  font-weight: 700;
+}
+
+.filter-dropdown__option.is-active:hover {
+  background: linear-gradient(135deg, rgba(196, 163, 90, 0.28), rgba(196, 163, 90, 0.16));
+}
+
+/* Legacy native filter selects (forms still using <select>) */
+.filter-select-wrap:not(.filter-dropdown)::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 0.95rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-inline-end: 2px solid #6b7f80;
+  border-bottom: 2px solid #6b7f80;
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+  z-index: 1;
+  transition:
+    border-color var(--transition),
+    transform 0.18s ease;
+}
+
+.filter-select-wrap:not(.filter-dropdown):focus-within::after {
+  border-color: var(--brand-gold-dark);
+  transform: translateY(-35%) rotate(225deg);
+}
+
+.filter-select,
+.filter-select-wrap:not(.filter-dropdown) > select,
+.filters-bar select,
+.sessions-filters select,
+.appointments-filters select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 148px;
+  height: 42px;
+  padding-block: 0;
+  padding-inline: 1rem 2.45rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff 0%, #f8f6f1 100%);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    background var(--transition);
+}
+
+.filter-select:hover,
+.filter-select-wrap:not(.filter-dropdown) > select:hover,
+.filters-bar select:hover,
+.sessions-filters select:hover,
+.appointments-filters select:hover {
+  border-color: rgba(196, 163, 90, 0.55);
+  background: #fff;
+}
+
+.filter-select:focus,
+.filter-select-wrap:not(.filter-dropdown) > select:focus,
+.filters-bar select:focus,
+.sessions-filters select:focus,
+.appointments-filters select:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.15);
+}
+
+.appointments-filters .input[type='date'],
+.sessions-filters .input[type='date'] {
+  box-sizing: border-box;
+  padding-inline: 1rem;
+}
+
+/* Custom Arabic date field */
+.date-field {
+  position: relative;
+  width: 100%;
+  min-width: 148px;
+}
+
+.date-field__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff 0%, #f8f6f1 100%);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: start;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    background var(--transition);
+}
+
+.date-field__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date-field__value.is-placeholder {
+  color: var(--text-muted);
+}
+
+.date-field__icon {
+  flex-shrink: 0;
+  color: #6b7f80;
+  transition: color var(--transition);
+}
+
+.date-field__trigger:hover {
+  border-color: rgba(196, 163, 90, 0.55);
+  background: #fff;
+}
+
+.date-field__trigger:hover .date-field__icon {
+  color: var(--brand-gold-dark);
+}
+
+.date-field.is-open .date-field__trigger,
+.date-field__trigger:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.15);
+}
+
+.date-field.is-open .date-field__icon {
+  color: var(--brand-gold-dark);
+}
+
+.date-field.is-disabled .date-field__trigger {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.date-field.is-invalid .date-field__trigger,
+.date-field .date-field__trigger.is-invalid {
+  border-color: var(--danger);
+}
+
+.date-field__panel {
+  padding: 0.75rem;
+  border: 1px solid rgba(196, 163, 90, 0.35);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 14px 32px rgba(30, 58, 60, 0.14),
+    0 2px 6px rgba(30, 58, 60, 0.06);
+  animation: filter-dropdown-in 0.16s ease;
+}
+
+.date-field__panel:not(.date-field__panel--portal) {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  top: calc(100% + 0.35rem);
+  z-index: 45;
+  width: min(300px, 92vw);
+}
+
+.date-field__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.date-field__month {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.date-field__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f8f6f1;
+  color: var(--brand-teal);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.date-field__nav:hover {
+  border-color: rgba(196, 163, 90, 0.55);
+  background: #fff;
+  color: var(--brand-gold-dark);
+}
+
+.date-field__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.15rem;
+  margin-bottom: 0.35rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.date-field__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.2rem;
+}
+
+.date-field__day {
+  aspect-ratio: 1;
+  min-height: 2rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.date-field__day:hover {
+  background: rgba(196, 163, 90, 0.14);
+}
+
+.date-field__day.is-outside {
+  color: #a8b6b7;
+}
+
+.date-field__day.is-today:not(.is-selected) {
+  box-shadow: inset 0 0 0 1.5px rgba(196, 163, 90, 0.65);
+  font-weight: 700;
+}
+
+.date-field__day.is-selected {
+  background: linear-gradient(135deg, #c4a35a, #a8893f);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(196, 163, 90, 0.35);
+}
+
+.date-field__day.is-selected:hover {
+  background: linear-gradient(135deg, #d4b86e, #c4a35a);
+  color: #fff;
+}
+
+.date-field__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--border);
+}
+
+.date-field__action {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  border-radius: 6px;
+  transition: color var(--transition), background var(--transition);
+}
+
+.date-field__action:hover {
+  color: var(--brand-teal);
+  background: rgba(30, 58, 60, 0.06);
+}
+
+.date-field__action--accent {
+  color: var(--brand-gold-dark);
+}
+
+.date-field__action--accent:hover {
+  color: var(--brand-gold-dark);
+  background: rgba(196, 163, 90, 0.14);
+}
+
+.time-field__panel {
+  width: min(220px, 92vw);
+  padding: 0.65rem;
+}
+
+.time-field__columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.time-field__col-label {
+  margin: 0 0 0.35rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.time-field__list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #faf9f6;
+  padding: 0.25rem;
+}
+
+.time-field__option {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.35rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.time-field__option:hover {
+  background: rgba(196, 163, 90, 0.14);
+}
+
+.time-field__option.is-selected {
+  background: linear-gradient(135deg, #c4a35a, #a8893f);
+  color: #fff;
+  font-weight: 700;
+}
+
+.modal .date-field__trigger,
+.field .date-field__trigger {
+  min-height: auto;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.appointments-filters label,
+.sessions-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.appointments-filters label > span,
+.sessions-filters label > span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-h);
+  padding-inline: 0.1rem;
+}
+
+.filters-bar,
+.appointments-filters,
+.sessions-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.filters-bar__actions,
+.appointments-filters > .btn,
+.sessions-filters > .btn {
+  align-self: flex-start;
+}
+
+.toolbar-with-reset {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.modal .case-form,
+.modal .appointment-form,
+.modal .session-form,
+.modal .invoice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

@@ -1,0 +1,32 @@
+.data-table--lawyers {
+  min-width: 600px;
+}
+
+.lawyer-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  white-space: normal;
+  min-width: 140px;
+}
+
+.lawyer-name-cell__name {
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.lawyer-name-cell__spec {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.lawyer-notes {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #fff, #faf7f0);
+  border: 1px solid rgba(196, 163, 90, 0.25);
+  color: var(--text-h);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}

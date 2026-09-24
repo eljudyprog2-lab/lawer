@@ -1,0 +1,18 @@
+/* Super-Admin companies / tenants management */
+
+.data-table--companies th:nth-child(1),
+.data-table--companies td:nth-child(1) {
+  min-width: 13rem;
+}
+
+.data-table--companies th:nth-child(2),
+.data-table--companies td:nth-child(2) {
+  min-width: 11rem;
+}
+
+@media (max-width: 900px) {
+  .data-table--companies th:nth-child(4),
+  .data-table--companies td:nth-child(4) {
+    display: none;
+  }
+}

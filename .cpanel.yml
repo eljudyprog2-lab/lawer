@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/dectestelomairidectestelomairi/public_html/dectest/react/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/rsync -av --delete --exclude='.git*' --exclude='node_modules' --exclude='.env*' --exclude='.github' ./ $DEPLOYPATH

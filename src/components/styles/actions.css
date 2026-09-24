@@ -1,0 +1,229 @@
+/* Shared row action buttons — solid colors + white icons; white on hover */
+
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  min-width: max-content;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: #6b7f80;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(30, 58, 60, 0.18);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.action-btn svg {
+  width: 17px;
+  height: 17px;
+  color: inherit;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  transition: color 220ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.action-btn:hover:not(:disabled) {
+  background: #fff !important;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 18px rgba(30, 58, 60, 0.16);
+}
+
+.action-btn:hover:not(:disabled) svg {
+  transform: scale(1.06);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 6px rgba(30, 58, 60, 0.1);
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 2px;
+}
+
+.action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* View / details — blue */
+.action-btn--view {
+  background: linear-gradient(145deg, #4d8fd4, #3a6ea5);
+  box-shadow: 0 4px 12px rgba(58, 110, 165, 0.3);
+  color: #fff;
+}
+
+.action-btn--view:hover:not(:disabled) {
+  color: #2f6fad;
+  border-color: rgba(47, 111, 173, 0.25);
+}
+
+/* Edit — orange */
+.action-btn--edit {
+  background: linear-gradient(145deg, #e0a04a, #c47a1a);
+  box-shadow: 0 4px 12px rgba(196, 122, 26, 0.3);
+  color: #fff;
+}
+
+.action-btn--edit:hover:not(:disabled) {
+  color: #c47a1a;
+  border-color: rgba(196, 122, 26, 0.28);
+}
+
+/* Delete — red */
+.action-btn--delete {
+  background: linear-gradient(145deg, #e05a5a, #c44545);
+  box-shadow: 0 4px 12px rgba(196, 69, 69, 0.3);
+  color: #fff;
+}
+
+.action-btn--delete:hover:not(:disabled) {
+  color: #c44545;
+  border-color: rgba(196, 69, 69, 0.28);
+}
+
+/* Notes / client cases — indigo (distinct from view) */
+.action-btn--notes {
+  background: linear-gradient(145deg, #6b7fd4, #4a5eb8);
+  box-shadow: 0 4px 12px rgba(74, 94, 184, 0.3);
+  color: #fff;
+}
+
+.action-btn--notes:hover:not(:disabled) {
+  color: #4a5eb8;
+  border-color: rgba(74, 94, 184, 0.28);
+}
+
+/* Download / confirm / pay — green */
+.action-btn--download,
+.action-btn--confirm,
+.action-btn--pay {
+  background: linear-gradient(145deg, #4caf7a, #2d8a5e);
+  box-shadow: 0 4px 12px rgba(45, 138, 94, 0.3);
+  color: #fff;
+}
+
+.action-btn--download:hover:not(:disabled),
+.action-btn--confirm:hover:not(:disabled),
+.action-btn--pay:hover:not(:disabled) {
+  color: #2d8a5e;
+  border-color: rgba(45, 138, 94, 0.28);
+}
+
+/* Gold / postpone / document view */
+.action-btn--view-gold,
+.action-btn--postpone {
+  background: linear-gradient(145deg, #b8975a, #8b775e);
+  box-shadow: 0 4px 12px rgba(139, 119, 94, 0.35);
+  color: #fff;
+}
+
+.action-btn--view-gold:hover:not(:disabled),
+.action-btn--postpone:hover:not(:disabled) {
+  color: #8b6f3a;
+  border-color: rgba(168, 137, 63, 0.3);
+}
+
+/* Print — blue */
+.action-btn--print {
+  background: linear-gradient(145deg, #4d8fd4, #3a6ea5);
+  box-shadow: 0 4px 12px rgba(58, 110, 165, 0.3);
+  color: #fff;
+}
+
+.action-btn--print:hover:not(:disabled) {
+  color: #3a6ea5;
+  border-color: rgba(58, 110, 165, 0.28);
+}
+
+/* Assign lawyer — teal */
+.action-btn--assign {
+  background: linear-gradient(145deg, #2e9db0, #23798a);
+  box-shadow: 0 4px 12px rgba(35, 121, 138, 0.3);
+  color: #fff;
+}
+
+.action-btn--assign:hover:not(:disabled) {
+  color: #23798a;
+  border-color: rgba(35, 121, 138, 0.28);
+}
+
+@media (max-width: 900px) {
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .action-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .row-actions {
+    gap: 0.3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .action-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+
+  .action-btn svg {
+    width: 13.5px;
+    height: 13.5px;
+  }
+
+  .row-actions {
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+  }
+
+  .action-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .row-actions {
+    gap: 0.2rem;
+  }
+}
+
+/* Ensure the actions cell in tables stays strictly one line */
+.data-table th:last-child,
+.data-table td:last-child {
+  white-space: nowrap;
+  width: 1%;
+}

@@ -1,0 +1,9 @@
+# Apache — SPA fallback for React Router (hosted under /react/)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /react/
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /react/index.html [L]
+</IfModule>
