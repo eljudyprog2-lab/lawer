@@ -16,6 +16,7 @@ import {
   HiOutlinePlus,
   HiOutlineSearch,
   HiOutlineEye,
+  HiOutlineEyeOff,
   HiOutlinePencil,
   HiOutlineTrash,
   HiOutlineInformationCircle,
@@ -37,6 +38,11 @@ import {
   HiOutlineLogin,
   HiOutlineOfficeBuilding,
   HiOutlineCollection,
+  HiOutlineShieldCheck,
+  HiOutlineKey,
+  HiOutlineLockClosed,
+  HiOutlinePhone,
+  HiOutlineMail,
 } from 'react-icons/hi'
 
 const map = {
@@ -60,6 +66,8 @@ const map = {
   plus: HiOutlinePlus,
   search: HiOutlineSearch,
   eye: HiOutlineEye,
+  eyeOff: HiOutlineEyeOff,
+  'eye-off': HiOutlineEyeOff,
   edit: HiOutlinePencil,
   trash: HiOutlineTrash,
   info: HiOutlineInformationCircle,
@@ -80,6 +88,11 @@ const map = {
   cash: HiOutlineCash,
   receipt: HiOutlineReceiptTax,
   login: HiOutlineLogin,
+  shield: HiOutlineShieldCheck,
+  key: HiOutlineKey,
+  lock: HiOutlineLockClosed,
+  phone: HiOutlinePhone,
+  mail: HiOutlineMail,
 }
 
 export function Icon({ name, className, size }) {

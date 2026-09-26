@@ -3,6 +3,7 @@ import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
 import { DateField } from '../ui/DateField'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { StatCard } from '../dashboard/StatCard'
 import { SessionFormModal } from '../sessions/SessionFormModal'
 import { SessionDetailsModal } from '../sessions/SessionDetailsModal'
@@ -92,6 +93,7 @@ export default function SessionsPage() {
   const [editingId, setEditingId] = useState(null)
   const [detailsId, setDetailsId] = useState(null)
   const [postponeId, setPostponeId] = useState(null)
+  const [deletingSession, setDeletingSession] = useState(null)
   const [calendarMonth, setCalendarMonth] = useState(() => new Date())
 
   const lawyerOptions = useMemo(
@@ -305,12 +307,14 @@ export default function SessionsPage() {
     }
   }
 
-  const handleDelete = async (id) => {
+  const handleConfirmDelete = async () => {
+    if (!deletingSession) return
     try {
-      await remove.mutateAsync(id)
-      if (String(detailsId) === String(id)) setDetailsId(null)
-      if (String(editingId) === String(id)) setEditingId(null)
-      if (String(postponeId) === String(id)) setPostponeId(null)
+      await remove.mutateAsync(deletingSession.id)
+      if (String(detailsId) === String(deletingSession.id)) setDetailsId(null)
+      if (String(editingId) === String(deletingSession.id)) setEditingId(null)
+      if (String(postponeId) === String(deletingSession.id)) setPostponeId(null)
+      setDeletingSession(null)
       await refetch()
     } catch {
       /* keep UI unchanged on failure */
@@ -572,7 +576,7 @@ export default function SessionsPage() {
                             type="button"
                             className="action-btn action-btn--delete"
                             title="حذف"
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => setDeletingSession(item)}
                           >
                             <Icon name="trash" size={16} />
                           </button>
@@ -676,6 +680,25 @@ export default function SessionsPage() {
         session={postponeSession}
         onClose={() => setPostponeId(null)}
         onPostpone={handlePostpone}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingSession)}
+        onClose={() => setDeletingSession(null)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف الجلسة"
+        message="هل أنت متأكد من رغبتك في حذف هذه الجلسة القضائية نهائياً؟"
+        itemName={deletingSession ? `جلسة ${deletingSession.sessionNumber || ''} - قضية ${deletingSession.caseTitle || ''}` : ''}
+        itemDetails={
+          deletingSession ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div><strong>تاريخ الجلسة:</strong> {formatDisplayDate(deletingSession.date)}</div>
+              <div><strong>المحكمة:</strong> {deletingSession.court || '—'}</div>
+            </div>
+          ) : null
+        }
+        warning="سيتم إزالة الجلسة وقراراتها ومواعيدها من النظام والتقويم نهائياً."
+        isLoading={remove.isPending}
       />
     </div>
   )

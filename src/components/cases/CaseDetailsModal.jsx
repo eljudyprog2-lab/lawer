@@ -128,19 +128,38 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
   const handleAddDocument = async (docForm) => {
     if (readOnly || !onUpdate || !caseData?.id) return
     const companyId = getStoredCompanyId()
-    const fd = buildDocumentFormData(
-      {
-        description: docForm.name,
-        fileName: docForm.fileName,
-        docType: docForm.type,
-        notes: docForm.notes,
-        caseId: String(caseData.id),
-        file: docForm.file,
-      },
-      { companyId },
-    )
+    const filesToUpload = docForm.files?.length ? docForm.files : docForm.file ? [docForm.file] : []
     try {
-      await createCaseDocument(fd)
+      if (filesToUpload.length > 0) {
+        for (const f of filesToUpload) {
+          const desc = filesToUpload.length > 1 ? `${docForm.name} - ${f.name}` : docForm.name
+          const fd = buildDocumentFormData(
+            {
+              description: desc,
+              fileName: f.name,
+              docType: docForm.type,
+              notes: docForm.notes,
+              caseId: String(caseData.id),
+              file: f,
+            },
+            { companyId },
+          )
+          await createCaseDocument(fd)
+        }
+      } else {
+        const fd = buildDocumentFormData(
+          {
+            description: docForm.name,
+            fileName: docForm.fileName,
+            docType: docForm.type,
+            notes: docForm.notes,
+            caseId: String(caseData.id),
+            file: docForm.file,
+          },
+          { companyId },
+        )
+        await createCaseDocument(fd)
+      }
       await loadDocuments()
       onUpdate()
     } catch (err) {

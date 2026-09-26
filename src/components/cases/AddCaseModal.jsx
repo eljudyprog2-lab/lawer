@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FormSection, Field, FieldGrid, FormBanner } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
 import { FilterSelect } from '../ui/FilterSelect'
@@ -83,7 +84,7 @@ export function AddCaseModal({
     setBanner('')
     setSubmitting(true)
     try {
-      await onSave(buildCasePayload(form, { companyId: getStoredCompanyId() }))
+      await onSave(buildCasePayload(form, { companyId: getStoredCompanyId() }), form.files || [])
       reset()
     } catch (err) {
       const parsed = parseApiError(err)
@@ -119,6 +120,7 @@ export function AddCaseModal({
     >
       <form id="add-case-form" className="case-form" onSubmit={handleSubmit}>
         <FormBanner>{banner}</FormBanner>
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FormSection icon={<Icon name="info" />} title="المعلومات الأساسية">
           <FieldGrid>
             <Field label="رقم القضية" required error={fieldErrors.number}>
@@ -313,23 +315,25 @@ export function AddCaseModal({
                   <input
                     type="file"
                     multiple
-                    accept=".pdf,.doc,.docx,image/*"
+                    accept="*/*"
                     className="file-upload__input"
                     onChange={(e) => {
-                      const count = e.target.files?.length || 0
+                      const files = Array.from(e.target.files || [])
+                      const count = files.length
                       setFilesLabel(
                         count === 0
                           ? 'لم يتم اختيار ملف'
                           : count === 1
-                            ? e.target.files[0].name
+                            ? files[0].name
                             : `${count} ملفات مختارة`,
                       )
+                      setForm((prev) => ({ ...prev, files }))
                     }}
                   />
                 </label>
                 <span className="file-upload__name">{filesLabel}</span>
               </div>
-              <p className="field__hint">يمكنك رفع عدة ملفات (PDF, Word, صور)</p>
+              <p className="field__hint">يمكنك رفع عدة ملفات (بجميع الصيغ)</p>
             </Field>
           </FieldGrid>
         </FormSection>

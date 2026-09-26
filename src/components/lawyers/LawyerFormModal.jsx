@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FormSection, Field, FieldGrid, FormBanner } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
 import {
@@ -119,6 +120,7 @@ export function LawyerFormModal({
     >
       <form id="lawyer-form" className="case-form" onSubmit={handleSubmit} noValidate>
         <FormBanner>{banner}</FormBanner>
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FormSection icon={<Icon name="lawyers" />} title="معلومات المحامي">
           <FieldGrid>
             <Field label="الاسم الكامل" required full error={fieldErrors.name}>

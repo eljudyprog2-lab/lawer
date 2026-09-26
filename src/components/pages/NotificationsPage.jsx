@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { useNotifications, useNotificationMutations } from '../../hooks/useNotifications'
 
 export default function NotificationsPage() {
   const { notifications, unreadCount, isLoading, error, refetch } = useNotifications()
   const { markRead, remove } = useNotificationMutations()
+  const [deletingNotification, setDeletingNotification] = useState(null)
 
   const markAllRead = async () => {
     const unread = notifications.filter((item) => !item.read)
@@ -115,7 +118,7 @@ export default function NotificationsPage() {
                   aria-label={`حذف ${item.title}`}
                   onClick={(e) => {
                     e.stopPropagation()
-                    removeOne(item.id)
+                    setDeletingNotification(item)
                   }}
                 >
                   <Icon name="trash" size={18} />
@@ -125,6 +128,22 @@ export default function NotificationsPage() {
           )}
         </section>
       ) : null}
+
+      {/* ── Modal تأكيد حذف الإشعار ── */}
+      <ConfirmDeleteModal
+        open={Boolean(deletingNotification)}
+        onClose={() => setDeletingNotification(null)}
+        onConfirm={async () => {
+          if (!deletingNotification) return
+          await removeOne(deletingNotification.id)
+          setDeletingNotification(null)
+        }}
+        title="تأكيد حذف الإشعار"
+        message="هل أنت متأكد من رغبتك في حذف هذا الإشعار نهائياً؟"
+        itemName={deletingNotification?.title}
+        confirmText="حذف الإشعار"
+        isLoading={remove.isPending}
+      />
     </div>
   )
 }

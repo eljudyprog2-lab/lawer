@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react'
+import { loginApi } from '../api/auth'
 import {
-  authenticate,
   clearAuthSession,
   readAuthSession,
   writeAuthSession,
@@ -22,23 +22,38 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = useCallback(
-    (payload) => {
-      const session = authenticate(payload)
-      if (!session) {
-        showToast('بيانات الدخول غير صحيحة', 'error')
-        return false
+    async (payload) => {
+      try {
+        const loginIdentifier = payload.login || payload.email || ''
+        const data = await loginApi({
+          login: loginIdentifier,
+          password: payload.password,
+          role: payload.role || 'admin',
+        })
+        const userObj = data?.data?.user || data?.user || {}
+        const companyId = data?.data?.company_id || data?.company_id || userObj.company_id || 2
+        const sessionWithCompany = {
+          token: data?.data?.token || data?.token || data?.access_token || '',
+          id: userObj.id,
+          name: userObj.full_name || userObj.name || loginIdentifier,
+          email: userObj.email || loginIdentifier,
+          phone: userObj.phone || '',
+          role: userObj.role || payload.role || 'admin',
+          roleId: payload.role || userObj.role || 'admin',
+          company_id: companyId,
+          company_name: userObj.company?.name || 'Law Office',
+          status: userObj.status || 'نشط',
+          raw: userObj,
+        }
+        writeAuthSession(sessionWithCompany)
+        setUser(sessionWithCompany)
+        showToast('تم تسجيل الدخول بنجاح', 'success')
+        return { ok: true, data: sessionWithCompany }
+      } catch (err) {
+        const parsed = parseApiError(err)
+        showToast(parsed.message, 'error')
+        return { ok: false, error: parsed }
       }
-      // Assign default company_id=2 on login so the axios interceptor
-      // automatically injects ?company_id=2 in every API request.
-      const sessionWithCompany = {
-        ...session,
-        company_id: session.company_id ?? 2,
-        company_name: session.company_name ?? 'Law Office',
-      }
-      writeAuthSession(sessionWithCompany)
-      setUser(sessionWithCompany)
-      showToast('تم تسجيل الدخول بنجاح', 'success')
-      return true
     },
     [showToast],
   )
@@ -103,6 +118,17 @@ export function AuthProvider({ children }) {
     })
   }, [])
 
+  const updateUserProfile = useCallback((patch) => {
+    setUser((prev) => {
+      const updated = {
+        ...(prev ?? {}),
+        ...patch,
+      }
+      writeAuthSession(updated)
+      return updated
+    })
+  }, [])
+
   const value = useMemo(
     () => ({
       user,
@@ -113,9 +139,10 @@ export function AuthProvider({ children }) {
       registering,
       logout,
       setCompany,
+      updateUserProfile,
       toast,
     }),
-    [user, login, register, registering, logout, setCompany, toast],
+    [user, login, register, registering, logout, setCompany, updateUserProfile, toast],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

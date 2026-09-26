@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { StatCard } from '../dashboard/StatCard'
 import { UploadDocumentModal } from '../documents/UploadDocumentModal'
 import { DocumentDetailsModal } from '../documents/DocumentDetailsModal'
@@ -55,6 +56,7 @@ export default function DocumentsPage() {
   const [uploadOpen, setUploadOpen] = useState(false)
   const [detailsId, setDetailsId] = useState(null)
   const [notesId, setNotesId] = useState(null)
+  const [deletingDoc, setDeletingDoc] = useState(null)
   const [toast, setToast] = useState(null)
 
   useEffect(() => {
@@ -109,25 +111,50 @@ export default function DocumentsPage() {
   const notesDoc = documents.find((item) => item.id === notesId) || null
 
   const handleUpload = async (form) => {
-    const fd = buildDocumentFormData(form, {
-      companyId: getStoredCompanyId(),
-      uploadedBy: user?.id,
-    })
+    const companyId = getStoredCompanyId()
+    const filesToUpload = form.files?.length ? form.files : form.file ? [form.file] : []
     try {
-      await create.mutateAsync(fd)
-      showToast('تم رفع المستند بنجاح')
+      if (filesToUpload.length > 0) {
+        for (const f of filesToUpload) {
+          const desc = filesToUpload.length > 1 ? `${form.description} - ${f.name}` : form.description
+          const fd = buildDocumentFormData(
+            {
+              ...form,
+              description: desc,
+              fileName: f.name,
+              file: f,
+              sizeBytes: f.size || 0,
+              mimeType: f.type || '',
+            },
+            {
+              companyId,
+              uploadedBy: user?.id,
+            },
+          )
+          await create.mutateAsync(fd)
+        }
+      } else {
+        const fd = buildDocumentFormData(form, {
+          companyId,
+          uploadedBy: user?.id,
+        })
+        await create.mutateAsync(fd)
+      }
+      showToast(filesToUpload.length > 1 ? `تم رفع ${filesToUpload.length} مستندات بنجاح` : 'تم رفع المستند بنجاح')
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
       throw err
     }
   }
 
-  const handleDelete = async (id) => {
+  const handleConfirmDelete = async () => {
+    if (!deletingDoc) return
     try {
-      await remove.mutateAsync(id)
-      if (detailsId === id) setDetailsId(null)
-      if (notesId === id) setNotesId(null)
-      showToast('تم حذف المستند')
+      await remove.mutateAsync(deletingDoc.id)
+      if (detailsId === deletingDoc.id) setDetailsId(null)
+      if (notesId === deletingDoc.id) setNotesId(null)
+      showToast('تم حذف المستند بنجاح')
+      setDeletingDoc(null)
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
     }
@@ -395,7 +422,7 @@ export default function DocumentsPage() {
                               className="action-btn action-btn--delete"
                               title="حذف"
                               aria-label={`حذف ${doc.fileName}`}
-                              onClick={() => handleDelete(doc.id)}
+                              onClick={() => setDeletingDoc(doc)}
                             >
                               <Icon name="trash" size={16} />
                             </button>
@@ -423,7 +450,10 @@ export default function DocumentsPage() {
         document={detailsDoc}
         onClose={() => setDetailsId(null)}
         onDownload={handleDownload}
-        onDelete={isAdmin ? handleDelete : undefined}
+        onDelete={isAdmin ? (id) => {
+          const target = documents.find((d) => d.id === id) || detailsDoc
+          setDeletingDoc(target)
+        } : undefined}
         canDelete={isAdmin}
       />
 
@@ -432,6 +462,25 @@ export default function DocumentsPage() {
         document={notesDoc}
         onClose={() => setNotesId(null)}
         onSave={handleSaveNotes}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingDoc)}
+        onClose={() => setDeletingDoc(null)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف المستند"
+        message="هل أنت متأكد من رغبتك في حذف هذا المستند نهائياً؟"
+        itemName={deletingDoc?.fileName || ''}
+        itemDetails={
+          deletingDoc ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div><strong>نوع المستند:</strong> {deletingDoc.docType || '—'}</div>
+              <div><strong>القضية:</strong> {deletingDoc.caseTitle || 'بدون قضية'}</div>
+            </div>
+          ) : null
+        }
+        warning="لا يمكن التراجع عن هذا الإجراء وسيتم حذف الملف المرفق من الخادم نهائياً."
+        isLoading={remove.isPending}
       />
     </div>
   )

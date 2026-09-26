@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FormSection, Field, FieldGrid } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
 import { documentTypeOptions } from '../../api/documents'
@@ -16,20 +17,41 @@ const emptyDoc = {
 export function UploadDocumentModal({ open, onClose, onSave, caseLabel }) {
   const [form, setForm] = useState(emptyDoc)
   const [fileLabel, setFileLabel] = useState('لم يتم اختيار ملف')
+  const [errors, setErrors] = useState({})
 
   const set = (key) => (e) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }))
+    if (errors[key]) {
+      setErrors((prev) => {
+        const next = { ...prev }
+        delete next[key]
+        return next
+      })
+    }
   }
 
   const handleClose = () => {
     setForm(emptyDoc)
+    setErrors({})
     setFileLabel('لم يتم اختيار ملف')
     onClose()
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.name.trim() || !form.fileName) return
+    const errs = {}
+    if (!form.fileName && (!form.files || !form.files.length)) {
+      errs.file = 'من فضلك اختر ملفاً للرفع'
+    }
+    if (!form.name.trim()) {
+      errs.name = 'من فضلك أدخل اسم أو وصف المستند'
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+
     try {
       await onSave({
         name: form.name,
@@ -37,12 +59,14 @@ export function UploadDocumentModal({ open, onClose, onSave, caseLabel }) {
         notes: form.notes,
         fileName: form.fileName,
         file: form.file,
+        files: form.files || (form.file ? [form.file] : []),
       })
       setForm(emptyDoc)
+      setErrors({})
       setFileLabel('لم يتم اختيار ملف')
       onClose()
-    } catch {
-      /* parent/modal shows error */
+    } catch (err) {
+      setErrors({ submit: err?.message || 'تعذر رفع المستند، يرجى المحاولة مرة أخرى' })
     }
   }
 
@@ -64,32 +88,50 @@ export function UploadDocumentModal({ open, onClose, onSave, caseLabel }) {
       }
     >
       <form id="upload-doc-form" className="case-form" onSubmit={handleSubmit}>
+        <ValidationSummaryBox errors={errors} />
         <FormSection icon={<Icon name="documents" />} title="معلومات المستند">
           <FieldGrid cols={1}>
-            <Field label="اختر الملف" required>
+            <Field label="اختر الملفات" required>
               <div className="file-upload">
                 <label className="file-upload__btn">
-                  اختيار ملف
+                  اختيار ملفات
                   <input
                     type="file"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"
+                    multiple
+                    accept="*/*"
                     className="file-upload__input"
                     required
                     onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      setFileLabel(file ? file.name : 'لم يتم اختيار ملف')
+                      const files = Array.from(e.target.files || [])
+                      const count = files.length
+                      setFileLabel(
+                        count === 0
+                          ? 'لم يتم اختيار ملف'
+                          : count === 1
+                            ? files[0].name
+                            : `${count} ملفات مختارة`,
+                      )
                       setForm((prev) => ({
                         ...prev,
-                        fileName: file?.name || '',
-                        file: file || null,
+                        name: prev.name || (count === 1 ? files[0].name.replace(/\.[^/.]+$/, '') : prev.name),
+                        fileName: count === 1 ? files[0].name : count > 1 ? `${count} ملفات مختارة` : '',
+                        file: files[0] || null,
+                        files,
                       }))
+                      if (errors.file) {
+                        setErrors((prev) => {
+                          const next = { ...prev }
+                          delete next.file
+                          return next
+                        })
+                      }
                     }}
                   />
                 </label>
                 <span className="file-upload__name">{fileLabel}</span>
               </div>
               <p className="field__hint">
-                الأنواع المسموحة: PDF, Word, Excel, صور (الحد الأقصى: 10 MB)
+                يمكنك رفع ملف أو عدة ملفات (بجميع الصيغ)
               </p>
             </Field>
             <Field label="اسم/وصف المستند" required>

@@ -13,8 +13,8 @@ export const dashboardTitles = {
 }
 
 const hiddenNavByRole = {
-  lawyer: ['lawyers'],
-  client: ['lawyers', 'clients'],
+  lawyer: ['lawyers', 'manage-lists'],
+  client: ['lawyers', 'clients', 'manage-lists'],
 }
 
 export function getNavItems(roleId) {

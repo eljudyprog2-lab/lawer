@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Field, FieldGrid } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
 import { TimeField } from '../ui/TimeField'
@@ -19,9 +20,11 @@ export function RescheduleAppointmentModal({
   onSubmit,
 }) {
   const [form, setForm] = useState(emptyForm)
+  const [errors, setErrors] = useState({})
 
   useEffect(() => {
     if (!open) return
+    setErrors({})
     setForm(emptyForm)
   }, [open, appointment])
 
@@ -29,11 +32,20 @@ export function RescheduleAppointmentModal({
 
   const set = (key) => (event) => {
     setForm((current) => ({ ...current, [key]: event.target.value }))
+    setErrors((prev) => ({ ...prev, [key]: '' }))
   }
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    if (!form.date || !form.time) return
+    const errs = {}
+    if (!form.date) errs.date = 'تاريخ الموعد الجديد مطلوب'
+    if (!form.time) errs.time = 'وقت الموعد الجديد مطلوب'
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+
     onSubmit(appointment.id, {
       date: form.date,
       time: form.time,
@@ -59,6 +71,7 @@ export function RescheduleAppointmentModal({
       }
     >
       <form id="reschedule-form" className="appointment-form" onSubmit={handleSubmit}>
+        <ValidationSummaryBox errors={errors} />
         <section className="appointment-details__section">
           <h3>
             <Icon name="calendar" size={18} />

@@ -1,0 +1,533 @@
+[
+  {
+    "endpoint": "/login",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The login field is required. (and 2 more errors)",
+        "errors": {
+          "login": [
+            "The login field is required."
+          ],
+          "password": [
+            "The password field is required."
+          ],
+          "role": [
+            "The role field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/login",
+    "method": "POST",
+    "payload": {
+      "login": "admin@test.com",
+      "password": "123",
+      "role": "invalid_role"
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected role is invalid.",
+        "errors": {
+          "role": [
+            "The selected role is invalid."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/users",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 4 more errors)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "full_name": [
+            "The full name field is required."
+          ],
+          "password": [
+            "The password field is required."
+          ],
+          "role": [
+            "The role field is required."
+          ],
+          "status": [
+            "The status field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/users",
+    "method": "POST",
+    "payload": {
+      "invalidTypesAndLengths": true
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected company id is invalid. (and 5 more errors)",
+        "errors": {
+          "company_id": [
+            "The selected company id is invalid."
+          ],
+          "full_name": [
+            "The full name field must not be greater than 255 characters."
+          ],
+          "email": [
+            "The email field must be a valid email address."
+          ],
+          "password": [
+            "The password field must be at least 6 characters."
+          ],
+          "role": [
+            "The selected role is invalid."
+          ],
+          "status": [
+            "The selected status is invalid."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/lawyers",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 1 more error)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "user_id": [
+            "The user id field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/lawyers",
+    "method": "POST",
+    "payload": {
+      "invalidLengths": true
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected company id is invalid. (and 3 more errors)",
+        "errors": {
+          "company_id": [
+            "The selected company id is invalid."
+          ],
+          "user_id": [
+            "The selected user id is invalid."
+          ],
+          "national_id": [
+            "The national id field must not be greater than 30 characters."
+          ],
+          "bar_number": [
+            "The bar number field must not be greater than 100 characters."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/clients",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 1 more error)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "full_name": [
+            "The full name field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/clients",
+    "method": "POST",
+    "payload": {
+      "invalidLengthsAndTypes": true
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected company id is invalid. (and 3 more errors)",
+        "errors": {
+          "company_id": [
+            "The selected company id is invalid."
+          ],
+          "full_name": [
+            "The full name field must not be greater than 255 characters."
+          ],
+          "email": [
+            "The email field must be a valid email address."
+          ],
+          "status": [
+            "The selected status is invalid."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/case-types",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 1 more error)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "name": [
+            "The name field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/case-categories",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 1 more error)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "name": [
+            "The name field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/cases",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 6 more errors)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "case_number": [
+            "The case number field is required."
+          ],
+          "title": [
+            "The title field is required."
+          ],
+          "type_id": [
+            "The type id field is required."
+          ],
+          "client_id": [
+            "The client id field is required."
+          ],
+          "lawyer_id": [
+            "The lawyer id field is required."
+          ],
+          "court_name": [
+            "The court name field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/cases",
+    "method": "POST",
+    "payload": {
+      "invalidEnums": true
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected company id is invalid. (and 6 more errors)",
+        "errors": {
+          "company_id": [
+            "The selected company id is invalid."
+          ],
+          "type_id": [
+            "The selected type id is invalid."
+          ],
+          "client_id": [
+            "The selected client id is invalid."
+          ],
+          "lawyer_id": [
+            "The selected lawyer id is invalid."
+          ],
+          "priority": [
+            "The selected priority is invalid."
+          ],
+          "stage": [
+            "The selected stage is invalid."
+          ],
+          "status": [
+            "The selected status is invalid."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/court-sessions",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 3 more errors)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "case_id": [
+            "The case id field is required."
+          ],
+          "session_number": [
+            "The session number field is required."
+          ],
+          "session_date": [
+            "The session date field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/court-sessions",
+    "method": "POST",
+    "payload": {
+      "invalidTypes": true
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected company id is invalid. (and 4 more errors)",
+        "errors": {
+          "company_id": [
+            "The selected company id is invalid."
+          ],
+          "case_id": [
+            "The selected case id is invalid."
+          ],
+          "session_number": [
+            "The session number field must be an integer."
+          ],
+          "session_date": [
+            "The session date field must be a valid date."
+          ],
+          "status": [
+            "The selected status is invalid."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/court-sessions/1/change-status",
+    "method": "PUT",
+    "payload": {
+      "status": "invalid_status"
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected status is invalid.",
+        "errors": {
+          "status": [
+            "The selected status is invalid."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/appointments",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 2 more errors)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "appointment_date": [
+            "The appointment date field is required."
+          ],
+          "appointment_time": [
+            "The appointment time field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/documents",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 2 more errors)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "title": [
+            "The title field is required."
+          ],
+          "file": [
+            "The file field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/invoices",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 5 more errors)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "invoice_number": [
+            "The invoice number field is required."
+          ],
+          "client_id": [
+            "The client id field is required."
+          ],
+          "issue_date": [
+            "The issue date field is required."
+          ],
+          "description": [
+            "The description field is required."
+          ],
+          "total_amount": [
+            "The total amount field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/invoices",
+    "method": "POST",
+    "payload": {
+      "invalidTypes": true
+    },
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The selected company id is invalid. (and 5 more errors)",
+        "errors": {
+          "company_id": [
+            "The selected company id is invalid."
+          ],
+          "invoice_number": [
+            "The invoice number field must not be greater than 100 characters."
+          ],
+          "client_id": [
+            "The selected client id is invalid."
+          ],
+          "issue_date": [
+            "The issue date field must be a valid date."
+          ],
+          "description": [
+            "The description field is required."
+          ],
+          "total_amount": [
+            "The total amount field must be a number."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/invoice-items",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The invoice id field is required. (and 2 more errors)",
+        "errors": {
+          "invoice_id": [
+            "The invoice id field is required."
+          ],
+          "item_name": [
+            "The item name field is required."
+          ],
+          "unit_price": [
+            "The unit price field is required."
+          ]
+        }
+      }
+    }
+  },
+  {
+    "endpoint": "/notifications",
+    "method": "POST",
+    "payload": {},
+    "result": {
+      "status": 422,
+      "data": {
+        "message": "The company id field is required. (and 3 more errors)",
+        "errors": {
+          "company_id": [
+            "The company id field is required."
+          ],
+          "user_id": [
+            "The user id field is required."
+          ],
+          "title": [
+            "The title field is required."
+          ],
+          "message": [
+            "The message field is required."
+          ]
+        }
+      }
+    }
+  }
+]

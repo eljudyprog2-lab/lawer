@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Pagination } from '../ui/Pagination'
+import { usePagination } from '../../hooks/usePagination'
 import { useNavigate } from 'react-router-dom'
 import { HiOutlineRefresh, HiOutlineExclamationCircle } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { ClientFormModal } from '../clients/ClientFormModal'
 import { ClientCasesModal } from '../clients/ClientCasesModal'
 import {
@@ -38,6 +41,8 @@ export default function ClientsPage() {
   const [editingClient, setEditingClient] = useState(null)
   const [casesClient, setCasesClient] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [deletingClient, setDeletingClient] = useState(null)
+  const [deletingLoading, setDeletingLoading] = useState(false)
 
   const showToast = (text, tone = 'success') => setToast({ text, tone })
 
@@ -93,8 +98,6 @@ export default function ClientsPage() {
 
   const hasActiveFilters = Boolean(query.trim())
 
-  const clearFilters = () => setQuery('')
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return clientsWithCounts
@@ -105,6 +108,10 @@ export default function ClientsPage() {
         .includes(q),
     )
   }, [clientsWithCounts, query])
+
+  const { page, setPage, paginated, resetPage } = usePagination(filtered)
+
+  const clearFilters = () => { setQuery(''); resetPage() }
 
   const openAdd = () => {
     setFormMode('add')
@@ -159,15 +166,19 @@ export default function ClientsPage() {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا الموكل؟')) return
+  const handleConfirmDelete = async () => {
+    if (!deletingClient) return
+    setDeletingLoading(true)
     try {
-      await deleteClient(id)
-      setClients((prev) => prev.filter((item) => item.id !== id))
-      if (casesClient?.id === id) setCasesClient(null)
+      await deleteClient(deletingClient.id)
+      setClients((prev) => prev.filter((item) => item.id !== deletingClient.id))
+      if (casesClient?.id === deletingClient.id) setCasesClient(null)
       showToast('تم حذف الموكل بنجاح')
+      setDeletingClient(null)
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
+    } finally {
+      setDeletingLoading(false)
     }
   }
 
@@ -282,11 +293,11 @@ export default function ClientsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((item) => (
+                  paginated.map((item) => (
                     <tr key={item.id}>
                       <td>{item.name}</td>
                       <td>{item.email}</td>
-                      <td>{item.phone || '—'}</td>
+                      <td><span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{item.phone || '—'}</span></td>
                       <td>{item.national_id || '—'}</td>
                       <td>
                         <span className={statusClass(item.status)}>{item.status}</span>
@@ -325,7 +336,7 @@ export default function ClientsPage() {
                             className="action-btn action-btn--delete"
                             title="حذف"
                             aria-label={`حذف ${item.name}`}
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => setDeletingClient(item)}
                           >
                             <Icon name="trash" size={16} />
                           </button>
@@ -337,13 +348,11 @@ export default function ClientsPage() {
               </tbody>
             </table>
           </div>
-          {filtered.length > 0 ? (
-            <div className="flex items-center justify-between border-t border-[#d5e0e0] px-4 py-3 text-xs text-[#6b7f80]">
-              <span>
-                عرض {filtered.length} من أصل {clients.length} موكل
-              </span>
-            </div>
-          ) : null}
+          <Pagination
+            page={page}
+            total={filtered.length}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       ) : null}
 
@@ -365,6 +374,25 @@ export default function ClientsPage() {
         client={casesClient}
         cases={casesByClientId.get(casesClient?.id) ?? []}
         onClose={() => setCasesClient(null)}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingClient)}
+        onClose={() => setDeletingClient(null)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف الموكل"
+        message="هل أنت متأكد من رغبتك في حذف هذا الموكل نهائياً؟"
+        itemName={deletingClient?.name || ''}
+        itemDetails={
+          deletingClient ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div><strong>رقم الجوال:</strong> {deletingClient.phone || '—'}</div>
+              <div><strong>رقم الهوية:</strong> {deletingClient.nationalId || '—'}</div>
+            </div>
+          ) : null
+        }
+        warning="سيتم حذف ملف الموكل وكافة بيانات التواصل والسجلات المرتبطة به."
+        isLoading={deletingLoading}
       />
     </div>
   )

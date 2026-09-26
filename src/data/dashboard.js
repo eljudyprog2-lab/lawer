@@ -47,6 +47,9 @@ export const navItems = [
   { id: 'documents', label: 'المستندات', path: '/documents', icon: 'documents' },
   { id: 'lawyers', label: 'المحامين', path: '/lawyers', icon: 'lawyers' },
   { id: 'clients', label: 'الموكلين', path: '/clients', icon: 'clients' },
+  { id: 'accounts', label: 'الحسابات', path: '/accounts', icon: 'clients', badge: '48' },
+  { id: 'permissions', label: 'الصلاحيات', path: '/permissions', icon: 'shield', badge: 'جديد' },
+  { id: 'manage-lists', label: 'إدارة القوائم', path: '/manage-lists', icon: 'tag' },
   { id: 'invoices', label: 'الفواتير', path: '/invoices', icon: 'invoices' },
 ]
 

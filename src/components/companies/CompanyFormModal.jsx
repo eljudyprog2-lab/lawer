@@ -9,6 +9,7 @@ import { Modal } from '../ui/Modal'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
 import { FilterSelect } from '../ui/FilterSelect'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import {
   companyStatusOptions,
   createCompany,
@@ -149,33 +150,28 @@ export function CompanyFormModal({ open, mode = 'add', company = null, onClose, 
   }
 
   const handleLogoChange = (event) => {
-    const file = event.target.files?.[0]
+    const files = Array.from(event.target.files || [])
+    const file = files[0]
     setBanner(null)
 
     if (!file) {
-      setForm((prev) => ({ ...prev, logo: null }))
+      setForm((prev) => ({ ...prev, logo: null, logoFiles: [] }))
       setErrors((prev) => ({ ...prev, logo: '' }))
       return
     }
 
-    if (file.type && !LOGO_TYPES.includes(file.type) && !file.type.startsWith('image/')) {
-      setErrors((prev) => ({ ...prev, logo: 'يُسمح بملفات الصور فقط' }))
-      event.target.value = ''
-      return
-    }
-
     if (file.size > MAX_LOGO_BYTES) {
-      setErrors((prev) => ({ ...prev, logo: 'حجم الشعار يجب ألا يتجاوز 2 ميجابايت' }))
+      setErrors((prev) => ({ ...prev, logo: 'حجم الملف يجب ألا يتجاوز 2 ميجابايت' }))
       event.target.value = ''
       return
     }
 
-    setForm((prev) => ({ ...prev, logo: file }))
+    setForm((prev) => ({ ...prev, logo: file, logoFiles: files }))
     setErrors((prev) => ({ ...prev, logo: '' }))
   }
 
   const clearLogo = () => {
-    setForm((prev) => ({ ...prev, logo: null }))
+    setForm((prev) => ({ ...prev, logo: null, logoFiles: [] }))
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -256,16 +252,12 @@ export function CompanyFormModal({ open, mode = 'add', company = null, onClose, 
     >
       <form id="company-form" onSubmit={handleSubmit} noValidate aria-busy={loading}>
         <div className="space-y-6">
-          {banner ? (
-            <div
-              role="status"
-              aria-live="polite"
-              className="flex items-start gap-3 rounded-xl border border-[#c44545]/25 bg-[#fdeeee] px-4 py-3 text-sm text-[#8a2b2b]"
-            >
-              <HiOutlineExclamationCircle size={20} className="mt-0.5 shrink-0" />
-              <p className="font-medium">{banner.text}</p>
-            </div>
-          ) : null}
+          <ValidationSummaryBox
+            errors={{
+              ...errors,
+              ...(banner?.text && !Object.keys(errors).length ? { submit: banner.text } : {}),
+            }}
+          />
 
           {/* Logo upload */}
           <section>
@@ -286,11 +278,12 @@ export function CompanyFormModal({ open, mode = 'add', company = null, onClose, 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-soft">
-                    {isEdit ? 'تغيير الشعار' : 'اختيار صورة'}
+                    {isEdit ? 'تغيير الملف / الشعار' : 'اختيار ملفات'}
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*"
+                      multiple
+                      accept="*/*"
                       className="sr-only"
                       onChange={handleLogoChange}
                     />
@@ -308,13 +301,15 @@ export function CompanyFormModal({ open, mode = 'add', company = null, onClose, 
                 </div>
                 <p className="mt-2 truncate text-sm text-[#3d4f50]">
                   {form.logo
-                    ? form.logo.name
+                    ? form.logoFiles?.length > 1
+                      ? `${form.logoFiles.length} ملفات مختارة`
+                      : form.logo.name
                     : isEdit
-                      ? 'اترك الحقل فارغاً للإبقاء على الشعار الحالي'
+                      ? 'اترك الحقل فارغاً للإبقاء على الملف الحالي'
                       : 'لم يتم اختيار ملف'}
                 </p>
                 <p className="mt-1 text-xs text-[#6b7f80]">
-                  PNG أو JPG أو WEBP — الحد الأقصى 2 ميجابايت
+                  يمكنك اختيار أي صيغة ملف (الحد الأقصى 2 ميجابايت للملف)
                 </p>
                 {errors.logo ? (
                   <p className="mt-1 text-xs font-medium text-[#c44545]">{errors.logo}</p>

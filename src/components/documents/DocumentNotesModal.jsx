@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Icon } from '../ui/Icon'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 
 export function DocumentNotesModal({ open, document: doc, onClose, onSave }) {
   const [notes, setNotes] = useState('')
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (open && doc) setNotes(doc.notes || '')
+    if (open && doc) {
+      setNotes(doc.notes || '')
+      setError(null)
+    }
   }, [open, doc])
 
   if (!doc) return null
@@ -15,9 +20,10 @@ export function DocumentNotesModal({ open, document: doc, onClose, onSave }) {
     e.preventDefault()
     try {
       await onSave?.(doc.id, notes.trim())
+      setError(null)
       onClose()
-    } catch {
-      /* parent surfaces error */
+    } catch (err) {
+      setError(err?.message || 'تعذر حفظ الملاحظة، يرجى المحاولة مرة أخرى')
     }
   }
 
@@ -51,13 +57,17 @@ export function DocumentNotesModal({ open, document: doc, onClose, onSave }) {
       }
     >
       <form id="doc-notes-form" className="doc-notes-form" onSubmit={handleSave}>
+        <ValidationSummaryBox errors={error} />
         <label className="field field--full">
           <span className="field__label">الملاحظة</span>
           <textarea
             className="input input--area doc-notes-form__area"
             rows={5}
             value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            onChange={(e) => {
+              setNotes(e.target.value)
+              if (error) setError(null)
+            }}
             placeholder="اكتب ملاحظة على المستند..."
           />
         </label>

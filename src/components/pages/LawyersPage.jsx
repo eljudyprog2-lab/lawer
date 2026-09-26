@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Pagination } from '../ui/Pagination'
+import { usePagination } from '../../hooks/usePagination'
 import { useNavigate } from 'react-router-dom'
 import { HiOutlineRefresh, HiOutlineExclamationCircle } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { LawyerFormModal } from '../lawyers/LawyerFormModal'
 import {
   fetchLawyers,
@@ -33,6 +36,8 @@ export default function LawyersPage() {
   const [formMode, setFormMode] = useState('add')
   const [editingLawyer, setEditingLawyer] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [deletingLawyer, setDeletingLawyer] = useState(null)
+  const [deletingLoading, setDeletingLoading] = useState(false)
 
   const showToast = (text, tone = 'success') => setToast({ text, tone })
 
@@ -63,8 +68,6 @@ export default function LawyersPage() {
 
   const hasActiveFilters = Boolean(query.trim())
 
-  const clearFilters = () => setQuery('')
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return lawyers
@@ -75,6 +78,10 @@ export default function LawyersPage() {
         .includes(q),
     )
   }, [lawyers, query])
+
+  const { page, setPage, paginated, resetPage } = usePagination(filtered)
+
+  const clearFilters = () => { setQuery(''); resetPage() }
 
   const openAdd = () => {
     setFormMode('add')
@@ -128,14 +135,18 @@ export default function LawyersPage() {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا المحامي؟')) return
+  const handleConfirmDelete = async () => {
+    if (!deletingLawyer) return
+    setDeletingLoading(true)
     try {
-      await deleteLawyer(id)
-      setLawyers((prev) => prev.filter((item) => item.id !== id))
+      await deleteLawyer(deletingLawyer.id)
+      setLawyers((prev) => prev.filter((item) => item.id !== deletingLawyer.id))
       showToast('تم حذف المحامي بنجاح')
+      setDeletingLawyer(null)
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
+    } finally {
+      setDeletingLoading(false)
     }
   }
 
@@ -250,7 +261,7 @@ export default function LawyersPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((item) => (
+                  paginated.map((item) => (
                     <tr key={item.id}>
                       <td>
                         <div className="lawyer-name-cell">
@@ -261,7 +272,7 @@ export default function LawyersPage() {
                         </div>
                       </td>
                       <td>{item.email}</td>
-                      <td>{item.phone || '—'}</td>
+                      <td><span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{item.phone || '—'}</span></td>
                       <td>{item.specialization || '—'}</td>
                       <td>
                         <span className={statusClass(item.status)}>{item.status}</span>
@@ -291,7 +302,7 @@ export default function LawyersPage() {
                             className="action-btn action-btn--delete"
                             title="حذف"
                             aria-label={`حذف ${item.name}`}
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => setDeletingLawyer(item)}
                           >
                             <Icon name="trash" size={16} />
                           </button>
@@ -303,13 +314,11 @@ export default function LawyersPage() {
               </tbody>
             </table>
           </div>
-          {filtered.length > 0 ? (
-            <div className="flex items-center justify-between border-t border-[#d5e0e0] px-4 py-3 text-xs text-[#6b7f80]">
-              <span>
-                عرض {filtered.length} من أصل {lawyers.length} محامٍ
-              </span>
-            </div>
-          ) : null}
+          <Pagination
+            page={page}
+            total={filtered.length}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       ) : null}
 
@@ -324,6 +333,25 @@ export default function LawyersPage() {
           setEditingLawyer(null)
         }}
         onSave={handleSave}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingLawyer)}
+        onClose={() => setDeletingLawyer(null)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف المحامي"
+        message="هل أنت متأكد من رغبتك في حذف هذا المحامي نهائياً؟"
+        itemName={deletingLawyer?.name || ''}
+        itemDetails={
+          deletingLawyer ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div><strong>البريد:</strong> {deletingLawyer.email || '—'}</div>
+              <div><strong>رقم القيد:</strong> {deletingLawyer.barNumber || '—'}</div>
+            </div>
+          ) : null
+        }
+        warning="سيتم إزالة ملف المحامي من النظام، وتجريده من القضايا المسندة إليه."
+        isLoading={deletingLoading}
       />
     </div>
   )

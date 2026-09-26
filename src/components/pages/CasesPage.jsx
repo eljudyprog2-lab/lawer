@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Pagination } from '../ui/Pagination'
+import { usePagination } from '../../hooks/usePagination'
 import { HiOutlineRefresh, HiOutlineExclamationCircle } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { AddCaseModal } from '../cases/AddCaseModal'
 import { CaseDetailsModal } from '../cases/CaseDetailsModal'
 import { caseStatusLabel, parseApiError } from '../../api/cases'
@@ -13,6 +16,7 @@ import {
 } from '../../hooks/useCases'
 import { useClients } from '../../hooks/useClients'
 import { useLawyers } from '../../hooks/useLawyers'
+import { buildDocumentFormData, createCaseDocument } from '../../api/documents'
 
 function statusClass(status) {
   if (status === 'closed' || status === 'منتهي') return 'status-pill status-pill--done'
@@ -53,6 +57,7 @@ export default function CasesPage() {
   const [query, setQuery] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [selectedCase, setSelectedCase] = useState(null)
+  const [deletingCase, setDeletingCase] = useState(null)
 
   const showToast = (text, tone = 'success') => setToast({ text, tone })
 
@@ -73,8 +78,6 @@ export default function CasesPage() {
 
   const hasActiveFilters = Boolean(query.trim())
 
-  const clearFilters = () => setQuery('')
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return cases
@@ -93,13 +96,37 @@ export default function CasesPage() {
     )
   }, [cases, query, lawyerNameById])
 
-  const handleSave = async (payload) => {
+  const { page, setPage, paginated, resetPage } = usePagination(filtered)
+
+  const clearFilters = () => { setQuery(''); resetPage() }
+
+  const handleSave = async (payload, files = []) => {
     const companyId = getStoredCompanyId()
     try {
-      await create.mutateAsync({
+      const created = await create.mutateAsync({
         ...payload,
         ...(companyId != null ? { company_id: companyId } : {}),
       })
+      const caseId = created?.id || created?.data?.id
+      if (files?.length && caseId) {
+        for (const file of files) {
+          try {
+            const fd = buildDocumentFormData(
+              {
+                description: file.name,
+                fileName: file.name,
+                docType: 'مستند قضية',
+                caseId: String(caseId),
+                file,
+              },
+              { companyId },
+            )
+            await createCaseDocument(fd)
+          } catch {
+            // Document upload failure shouldn't cancel case creation
+          }
+        }
+      }
       showToast('تم إضافة القضية بنجاح')
       setAddOpen(false)
       await refetch()
@@ -113,11 +140,13 @@ export default function CasesPage() {
     await refetch()
   }
 
-  const handleDelete = async (id) => {
+  const handleConfirmDelete = async () => {
+    if (!deletingCase) return
     try {
-      await remove.mutateAsync(id)
-      if (selectedCase?.id === id) setSelectedCase(null)
+      await remove.mutateAsync(deletingCase.id)
+      if (selectedCase?.id === deletingCase.id) setSelectedCase(null)
       showToast('تم حذف القضية بنجاح')
+      setDeletingCase(null)
       await refetch()
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
@@ -244,7 +273,7 @@ export default function CasesPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((item) => (
+                  paginated.map((item) => (
                     <tr key={item.id}>
                       <td className="data-table__mono">{item.case_number}</td>
                       <td>{item.title}</td>
@@ -282,7 +311,7 @@ export default function CasesPage() {
                             className="action-btn action-btn--delete"
                             title="حذف"
                             aria-label={`حذف ${item.title}`}
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => setDeletingCase(item)}
                           >
                             <Icon name="trash" size={16} />
                           </button>
@@ -294,13 +323,11 @@ export default function CasesPage() {
               </tbody>
             </table>
           </div>
-          {filtered.length > 0 ? (
-            <div className="flex items-center justify-between border-t border-[#d5e0e0] px-4 py-3 text-xs text-[#6b7f80]">
-              <span>
-                عرض {filtered.length} من أصل {cases.length} قضية
-              </span>
-            </div>
-          ) : null}
+          <Pagination
+            page={page}
+            total={filtered.length}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       ) : null}
 
@@ -331,6 +358,25 @@ export default function CasesPage() {
         onClose={() => setSelectedCase(null)}
         onUpdate={handleUpdateCase}
         readOnly={false}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingCase)}
+        onClose={() => setDeletingCase(null)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف القضية"
+        message="هل أنت متأكد من رغبتك في حذف ملف هذه القضية نهائياً؟"
+        itemName={deletingCase ? `${deletingCase.number ? `${deletingCase.number} - ` : ''}${deletingCase.title}` : ''}
+        itemDetails={
+          deletingCase ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div><strong>الموكل:</strong> {deletingCase.clientName || '—'}</div>
+              <div><strong>المحكمة:</strong> {deletingCase.court || '—'}</div>
+            </div>
+          ) : null
+        }
+        warning="سيؤدي حذف القضية إلى إزالة كافة البيانات والمستندات والجلسات المسجلة المرتبطة بها."
+        isLoading={remove.isPending}
       />
     </div>
   )

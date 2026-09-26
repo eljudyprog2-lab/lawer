@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Field, FieldGrid, FormBanner } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
 import { TimeField } from '../ui/TimeField'
@@ -102,6 +103,7 @@ export function AppointmentFormModal({
     >
       <form id="appointment-form" className="appointment-form" onSubmit={handleSubmit} noValidate>
         <FormBanner>{banner}</FormBanner>
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FieldGrid cols={2}>
           <Field label="التاريخ" required error={fieldErrors.date}>
             <DateField

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FormSection, Field, FieldGrid } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
 import { FilterSelect } from '../ui/FilterSelect'
@@ -15,11 +16,13 @@ export function RecordPaymentModal({ open, invoice, onClose, onSave }) {
   const [form, setForm] = useState(emptyPaymentForm)
   const [fileLabel, setFileLabel] = useState('اسحب الملف هنا أو انقر للاختيار')
   const [submitting, setSubmitting] = useState(false)
+  const [errors, setErrors] = useState({})
 
   const due = invoice ? remaining(invoice) : 0
 
   useEffect(() => {
     if (!open || !invoice) return
+    setErrors({})
     setForm({
       ...emptyPaymentForm,
       amount: String(remaining(invoice)),
@@ -30,6 +33,7 @@ export function RecordPaymentModal({ open, invoice, onClose, onSave }) {
 
   const set = (key) => (e) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }))
+    setErrors((prev) => ({ ...prev, [key]: '' }))
   }
 
   const afterPayment = useMemo(
@@ -42,7 +46,21 @@ export function RecordPaymentModal({ open, invoice, onClose, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const amount = Number(form.amount) || 0
-    if (amount <= 0 || amount > due) return
+    const errs = {}
+    if (!form.amount || amount <= 0) {
+      errs.amount = 'يرجى إدخال مبلغ صحيح للدفعة أكبر من صفر'
+    } else if (amount > due) {
+      errs.amount = `مبلغ الدفعة لا يمكن أن يتجاوز المبلغ المتبقي (${formatMoney(due)})`
+    }
+    if (!form.date) {
+      errs.date = 'تاريخ الدفعة مطلوب'
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+
     setSubmitting(true)
     try {
       await onSave?.(invoice.id, {
@@ -52,6 +70,8 @@ export function RecordPaymentModal({ open, invoice, onClose, onSave }) {
         reference: form.reference.trim(),
         notes: form.notes.trim(),
         receiptName: form.receiptName,
+        receiptFiles: form.receiptFiles || [],
+        receiptFile: form.receiptFile || null,
       })
       onClose()
     } catch {
@@ -84,6 +104,7 @@ export function RecordPaymentModal({ open, invoice, onClose, onSave }) {
       }
     >
       <form id="payment-form" className="case-form" onSubmit={handleSubmit}>
+        <ValidationSummaryBox errors={errors} />
         <section className="payment-summary">
           <h3>
             <Icon name="invoices" size={18} />
@@ -160,15 +181,28 @@ export function RecordPaymentModal({ open, invoice, onClose, onSave }) {
             <label className="upload-drop">
               <Icon name="upload" size={26} />
               <span>{fileLabel}</span>
-              <small>الأنواع المسموحة: PDF, JPG, PNG, DOC (الحد الأقصى: 5 ميجا)</small>
+              <small>يمكنك اختيار عدة ملفات (بجميع الصيغ)</small>
               <input
                 type="file"
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                multiple
+                accept="*/*"
                 className="file-upload__input"
                 onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  setFileLabel(file ? file.name : 'اسحب الملف هنا أو انقر للاختيار')
-                  setForm((prev) => ({ ...prev, receiptName: file?.name || '' }))
+                  const files = Array.from(e.target.files || [])
+                  const count = files.length
+                  setFileLabel(
+                    count === 0
+                      ? 'اسحب الملفات هنا أو انقر للاختيار'
+                      : count === 1
+                        ? files[0].name
+                        : `${count} ملفات مختارة`,
+                  )
+                  setForm((prev) => ({
+                    ...prev,
+                    receiptName: count === 1 ? files[0].name : count > 1 ? `${count} ملفات مختارة` : '',
+                    receiptFiles: files,
+                    receiptFile: files[0] || null,
+                  }))
                 }}
               />
             </label>

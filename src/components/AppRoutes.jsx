@@ -14,6 +14,10 @@ import SessionsPage from './pages/SessionsPage'
 import InvoicesPage from './pages/InvoicesPage'
 import ProfilePage from './pages/ProfilePage'
 import NotificationsPage from './pages/NotificationsPage'
+import AccountsPage from './pages/AccountsPage'
+import PermissionsPage from './pages/PermissionsPage'
+import ManageListsPage from './pages/ManageListsPage'
+import ListDetailPage from './pages/ListDetailPage'
 import AuthPage from './pages/AuthPage'
 
 export function AppRoutes() {
@@ -37,6 +41,12 @@ export function AppRoutes() {
           <Route element={<RoleRoute navId="clients" />}>
             <Route path="clients" element={<ClientsPage />} />
             <Route path="clients/:id" element={<ClientDetailPage />} />
+          </Route>
+          <Route path="accounts" element={<AccountsPage />} />
+          <Route path="permissions" element={<PermissionsPage />} />
+          <Route element={<RoleRoute navId="manage-lists" />}>
+            <Route path="manage-lists" element={<ManageListsPage />} />
+            <Route path="manage-lists/:listKey" element={<ListDetailPage />} />
           </Route>
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="profile" element={<ProfilePage />} />

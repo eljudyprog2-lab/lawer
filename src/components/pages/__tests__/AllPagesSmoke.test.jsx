@@ -21,6 +21,10 @@ import ClientDetailPage from '../ClientDetailPage'
 import InvoicesPage from '../InvoicesPage'
 import ProfilePage from '../ProfilePage'
 import NotificationsPage from '../NotificationsPage'
+import AccountsPage from '../AccountsPage'
+import PermissionsPage from '../PermissionsPage'
+import ManageListsPage from '../ManageListsPage'
+import ListDetailPage from '../ListDetailPage'
 
 const mock = new MockAdapter(apiClient)
 
@@ -206,6 +210,42 @@ describe('All Pages Smoke Tests — verifies every page renders cleanly', () => 
     renderPage(<NotificationsPage />, { route: '/notifications' })
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'الإشعارات' })).toBeInTheDocument()
+    })
+  })
+
+  it('14. AccountsPage renders successfully', async () => {
+    renderPage(<AccountsPage />, { route: '/accounts' })
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'إدارة الحسابات والمستخدمين' })).toBeInTheDocument()
+      expect(screen.getByText('إجمالي الحسابات المسجلة')).toBeInTheDocument()
+    })
+  })
+
+  it('15. PermissionsPage renders successfully', async () => {
+    renderPage(<PermissionsPage />, { route: '/permissions' })
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'إدارة الصلاحيات والأدوار' })).toBeInTheDocument()
+      expect(screen.getByText('مصفوفة الصلاحيات وأدوار النظام')).toBeInTheDocument()
+    })
+  })
+
+  it('16. ManageListsPage renders successfully', async () => {
+    renderPage(<ManageListsPage />, { route: '/manage-lists' })
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'مجموعات الخيارات والقوائم المنسدلة' })).toBeInTheDocument()
+      expect(screen.getByText('إجمالي مجموعات القوائم')).toBeInTheDocument()
+    })
+  })
+
+  it('17. ListDetailPage renders successfully', async () => {
+    renderPage(
+      <Routes>
+        <Route path="/manage-lists/:listKey" element={<ListDetailPage />} />
+      </Routes>,
+      { route: '/manage-lists/case-types' },
+    )
+    await waitFor(() => {
+      expect(screen.getByText(/إدارة خيارات: أنواع القضايا/)).toBeInTheDocument()
     })
   })
 })

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FilterSelect } from '../ui/FilterSelect'
 import { Icon } from '../ui/Icon'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { formatDisplayDate } from '../../utils/formatDisplay'
 
 export function AssignLawyerModal({
@@ -12,17 +13,25 @@ export function AssignLawyerModal({
   lawyerOptions = [],
 }) {
   const [lawyerId, setLawyerId] = useState('')
+  const [errors, setErrors] = useState({})
 
   useEffect(() => {
-    if (open) setLawyerId(appointment?.lawyerId || '')
+    if (open) {
+      setLawyerId(appointment?.lawyerId || '')
+      setErrors({})
+    }
   }, [open, appointment])
 
   if (!appointment) return null
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    if (!lawyerId) return
+    if (!lawyerId) {
+      setErrors({ lawyerId: 'من فضلك اختر محامياً للتعيين' })
+      return
+    }
     onAssign(appointment.id, lawyerId)
+    setErrors({})
     onClose()
   }
 
@@ -44,6 +53,7 @@ export function AssignLawyerModal({
       }
     >
       <form id="assign-lawyer-form" onSubmit={handleSubmit}>
+        <ValidationSummaryBox errors={errors} />
         <section className="appointment-summary">
           <h3>
             <Icon name="calendar" size={19} />
@@ -61,7 +71,10 @@ export function AssignLawyerModal({
           </span>
           <FilterSelect
             value={lawyerId}
-            onChange={setLawyerId}
+            onChange={(val) => {
+              setLawyerId(val)
+              if (errors.lawyerId) setErrors({})
+            }}
             aria-label="اختر المحامي"
             options={[
               { value: '', label: '-- اختر محامي --' },

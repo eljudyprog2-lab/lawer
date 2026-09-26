@@ -158,3 +158,81 @@ ul {
     font-size: 14px;
   }
 }
+
+/* ── Pagination ── */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1.1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.pagination-bar__info {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.pg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    color var(--transition),
+    box-shadow var(--transition);
+}
+
+.pg-btn:hover:not(:disabled):not(.pg-btn--active):not(.pg-btn--dots) {
+  border-color: rgba(196, 163, 90, 0.55);
+  color: var(--brand-teal);
+  background: rgba(196, 163, 90, 0.06);
+}
+
+.pg-btn--active {
+  border-color: var(--brand-gold);
+  background: linear-gradient(135deg, #c4a35a, #a8893f);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(196, 163, 90, 0.35);
+  cursor: default;
+}
+
+.pg-btn--nav {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.pg-btn--nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pg-btn--dots {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: default;
+  font-size: 1rem;
+}
+

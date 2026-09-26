@@ -3,6 +3,7 @@ import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
 import { DateField } from '../ui/DateField'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { AppointmentFormModal } from '../appointments/AppointmentFormModal'
 import { AppointmentDetailsModal } from '../appointments/AppointmentDetailsModal'
 import { AssignLawyerModal } from '../appointments/AssignLawyerModal'
@@ -49,6 +50,7 @@ export default function AppointmentsPage() {
   const [assignId, setAssignId] = useState(null)
   const [confirmId, setConfirmId] = useState(null)
   const [rescheduleId, setRescheduleId] = useState(null)
+  const [deletingAppointment, setDeletingAppointment] = useState(null)
   const [toast, setToast] = useState(null)
 
   useEffect(() => {
@@ -251,15 +253,17 @@ export default function AppointmentsPage() {
     }
   }
 
-  const handleDelete = async (id) => {
+  const handleConfirmDelete = async () => {
+    if (!deletingAppointment) return
     try {
-      await remove.mutateAsync(id)
-      if (detailsId === id) setDetailsId(null)
-      if (editingId === id) {
+      await remove.mutateAsync(deletingAppointment.id)
+      if (detailsId === deletingAppointment.id) setDetailsId(null)
+      if (editingId === deletingAppointment.id) {
         setEditingId(null)
         setFormOpen(false)
       }
       showToast('تم حذف الموعد بنجاح')
+      setDeletingAppointment(null)
       await refetch()
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
@@ -527,7 +531,7 @@ export default function AppointmentsPage() {
                             type="button"
                             className="action-btn action-btn--delete"
                             title="حذف الموعد"
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => setDeletingAppointment(item)}
                           >
                             <Icon name="trash" size={16} />
                           </button>
@@ -580,6 +584,25 @@ export default function AppointmentsPage() {
         appointment={rescheduleAppointment}
         onClose={() => setRescheduleId(null)}
         onSubmit={handleReschedule}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingAppointment)}
+        onClose={() => setDeletingAppointment(null)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف الموعد"
+        message="هل أنت متأكد من رغبتك في حذف هذا الموعد نهائياً؟"
+        itemName={deletingAppointment ? `موعد ${deletingAppointment.clientName || ''} - ${formatDisplayDate(deletingAppointment.date)}` : ''}
+        itemDetails={
+          deletingAppointment ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div><strong>الموكل:</strong> {deletingAppointment.clientName || '—'}</div>
+              <div><strong>المحامي:</strong> {deletingAppointment.lawyerName || 'بدون محامي'}</div>
+            </div>
+          ) : null
+        }
+        warning="سيتم إلغاء الموعد وحذفه من جدول المواعيد والتقويم نهائياً."
+        isLoading={remove.isPending}
       />
     </div>
   )

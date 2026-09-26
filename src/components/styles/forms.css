@@ -115,13 +115,15 @@
   width: 100%;
   min-width: 148px;
   height: 42px;
-  padding: 0 0.95rem;
+  min-height: 42px;
+  padding: 0 0.85rem;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: linear-gradient(180deg, #fff 0%, #f8f6f1 100%);
+  border-radius: 10px;
+  background: #ffffff;
   color: var(--text-h);
   font: inherit;
   font-size: 0.9rem;
+  font-weight: 500;
   line-height: 1.4;
   cursor: pointer;
   box-sizing: border-box;
@@ -155,7 +157,7 @@
 
 .filter-dropdown__trigger:hover {
   border-color: rgba(196, 163, 90, 0.55);
-  background: #fff;
+  background: #ffffff;
 }
 
 .filter-dropdown__trigger:hover .filter-dropdown__chevron {
@@ -166,8 +168,8 @@
 .filter-dropdown__trigger:focus {
   outline: none;
   border-color: var(--brand-gold);
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.15);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.16);
 }
 
 .filter-dropdown.is-open .filter-dropdown__chevron {
@@ -182,6 +184,7 @@
 
 .filter-dropdown.is-invalid .filter-dropdown__trigger {
   border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(196, 69, 69, 0.12);
 }
 
 .field .filter-dropdown,
@@ -195,11 +198,11 @@ label .filter-dropdown,
 
 .modal .filter-dropdown__trigger,
 .field .filter-dropdown__trigger {
-  min-height: auto;
-  height: auto;
-  padding: 0.7rem 0.85rem;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 0.85rem;
   border-radius: 10px;
-  background: #fff;
+  background: #ffffff;
 }
 
 .filter-dropdown__menu {
@@ -295,25 +298,27 @@ label .filter-dropdown,
 .filter-select-wrap:not(.filter-dropdown) > select,
 .filters-bar select,
 .sessions-filters select,
-.appointments-filters select {
+.appointments-filters select,
+select.input {
   box-sizing: border-box;
   width: 100%;
   min-width: 148px;
   height: 42px;
+  min-height: 42px;
   padding-block: 0;
-  padding-inline: 1rem 2.45rem;
+  padding-inline: 0.85rem 2.45rem;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: linear-gradient(180deg, #fff 0%, #f8f6f1 100%);
+  border-radius: 10px;
+  background: #ffffff;
   color: var(--text-h);
   font: inherit;
   font-size: 0.9rem;
+  font-weight: 500;
   line-height: 1.4;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: none;
   transition:
     border-color var(--transition),
     box-shadow var(--transition),
@@ -324,20 +329,22 @@ label .filter-dropdown,
 .filter-select-wrap:not(.filter-dropdown) > select:hover,
 .filters-bar select:hover,
 .sessions-filters select:hover,
-.appointments-filters select:hover {
+.appointments-filters select:hover,
+select.input:hover {
   border-color: rgba(196, 163, 90, 0.55);
-  background: #fff;
+  background: #ffffff;
 }
 
 .filter-select:focus,
 .filter-select-wrap:not(.filter-dropdown) > select:focus,
 .filters-bar select:focus,
 .sessions-filters select:focus,
-.appointments-filters select:focus {
+.appointments-filters select:focus,
+select.input:focus {
   outline: none;
   border-color: var(--brand-gold);
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.15);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.16);
 }
 
 .appointments-filters .input[type='date'],
@@ -685,3 +692,173 @@ label .filter-dropdown,
   flex-direction: column;
   gap: 1rem;
 }
+
+/* ── Password field with show/hide toggle ── */
+.pwd-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pwd-field__input {
+  width: 100%;
+  padding-inline-end: 2.75rem !important;
+}
+
+.pwd-field__toggle {
+  position: absolute;
+  inset-inline-end: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color var(--transition), background var(--transition);
+}
+
+.pwd-field__toggle:hover {
+  color: var(--brand-teal);
+  background: rgba(30, 58, 60, 0.06);
+}
+
+/* ── Password strength bar ── */
+.pwd-strength {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.pwd-strength__header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.pwd-strength__bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.pwd-strength__fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+/* ── Change Password flat field groups ── */
+.chpwd-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.chpwd-group__label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.chpwd-group__label svg {
+  color: var(--brand-gold-dark);
+  flex-shrink: 0;
+}
+
+/* Input + eye button in a flex row — NO absolute positioning */
+.chpwd-input-wrap {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #dde3e3;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.chpwd-input-wrap:focus-within {
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.16);
+}
+
+.chpwd-input-wrap:hover:not(:focus-within) {
+  border-color: rgba(196, 163, 90, 0.55);
+}
+
+.chpwd-input-wrap .input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.chpwd-input-wrap .input:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.chpwd-eye {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  flex-shrink: 0;
+  border: none;
+  border-inline-start: 1px solid #eaeaea;
+  background: #fafaf8;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+
+.chpwd-eye:hover {
+  color: var(--brand-teal);
+  background: rgba(30, 58, 60, 0.05);
+}
+
+/* Password strength row */
+.chpwd-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.chpwd-strength__bar {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.chpwd-strength__fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+/* Match confirmation message */
+.chpwd-match {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2d8a5e;
+}
+

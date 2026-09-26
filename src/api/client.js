@@ -32,11 +32,27 @@ export const apiClient = axios.create({
   },
 })
 
+export function getStoredToken() {
+  try {
+    const raw = localStorage.getItem(AUTH_KEY)
+    if (!raw) return null
+    const session = JSON.parse(raw)
+    return session?.token || session?.access_token || null
+  } catch {
+    return null
+  }
+}
+
 /**
- * Request interceptor: automatically inject company_id into
+ * Request interceptor: automatically attach Bearer token and inject company_id into
  * GET params and POST/PUT/PATCH JSON bodies for tenant-scoped endpoints.
  */
 apiClient.interceptors.request.use((config) => {
+  const token = getStoredToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+
   const companyId = getStoredCompanyId()
   if (companyId) {
     if (!config.params) config.params = {}

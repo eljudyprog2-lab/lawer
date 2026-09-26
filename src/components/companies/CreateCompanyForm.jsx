@@ -13,6 +13,7 @@ import {
   HiOutlineX,
 } from 'react-icons/hi'
 import { createCompany, parseApiError } from '../../api/companies'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024
 const LOGO_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp']
@@ -85,34 +86,32 @@ export function CreateCompanyForm({ onSuccess }) {
     setBanner(null)
   }
 
-  const applyLogoFile = (file) => {
+  const applyLogoFiles = (filesList) => {
     setBanner(null)
+    const files = Array.from(filesList || [])
+    const file = files[0]
     if (!file) return
 
-    if (file.type && !LOGO_TYPES.includes(file.type) && !file.type.startsWith('image/')) {
-      setErrors((prev) => ({ ...prev, logo: 'يُسمح بملفات PNG أو JPG أو SVG فقط' }))
-      return
-    }
     if (file.size > MAX_LOGO_BYTES) {
-      setErrors((prev) => ({ ...prev, logo: 'حجم الشعار يجب ألا يتجاوز 2 ميجابايت' }))
+      setErrors((prev) => ({ ...prev, logo: 'حجم الملف يجب ألا يتجاوز 2 ميجابايت' }))
       return
     }
 
-    setForm((prev) => ({ ...prev, logo: file }))
+    setForm((prev) => ({ ...prev, logo: file, logoFiles: files }))
     setErrors((prev) => ({ ...prev, logo: '' }))
   }
 
   const handleLogoChange = (event) => {
-    const file = event.target.files?.[0]
-    if (!file) {
-      setForm((prev) => ({ ...prev, logo: null }))
+    const files = event.target.files
+    if (!files || !files.length) {
+      setForm((prev) => ({ ...prev, logo: null, logoFiles: [] }))
       return
     }
-    applyLogoFile(file)
+    applyLogoFiles(files)
   }
 
   const clearLogo = () => {
-    setForm((prev) => ({ ...prev, logo: null }))
+    setForm((prev) => ({ ...prev, logo: null, logoFiles: [] }))
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -237,20 +236,25 @@ export function CreateCompanyForm({ onSuccess }) {
       </nav>
 
       <div className="register-card" aria-busy={loading}>
-        {banner ? (
+        {banner?.tone === 'success' ? (
           <div
             role="status"
             aria-live="polite"
-            className={`register-banner register-banner--${banner.tone}`}
+            className="register-banner register-banner--success"
           >
-            {banner.tone === 'success' ? (
-              <HiOutlineCheckCircle size={20} className="shrink-0" />
-            ) : (
-              <HiOutlineExclamationCircle size={20} className="shrink-0" />
-            )}
+            <HiOutlineCheckCircle size={20} className="shrink-0" />
             <p>{banner.text}</p>
           </div>
         ) : null}
+
+        <ValidationSummaryBox
+          errors={{
+            ...errors,
+            ...(banner?.tone === 'error' && banner?.text && !Object.keys(errors).length
+              ? { submit: banner.text }
+              : {}),
+          }}
+        />
 
         <AnimatePresence mode="wait">
           {done ? (
@@ -348,22 +352,27 @@ export function CreateCompanyForm({ onSuccess }) {
                     onDrop={(e) => {
                       e.preventDefault()
                       setDragOver(false)
-                      applyLogoFile(e.dataTransfer.files?.[0])
+                      applyLogoFiles(e.dataTransfer.files)
                     }}
                   >
                     <input
                       ref={fileInputRef}
                       id="office-logo"
                       type="file"
-                      accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                      multiple
+                      accept="*/*"
                       className="sr-only"
                       onChange={handleLogoChange}
                     />
-                    {logoPreview ? (
+                    {logoPreview || form.logo ? (
                       <div className="register-upload__preview">
-                        <img src={logoPreview} alt="معاينة الشعار" />
+                        {logoPreview ? <img src={logoPreview} alt="معاينة الشعار" /> : null}
                         <div className="register-upload__meta">
-                          <strong>{form.logo?.name}</strong>
+                          <strong>
+                            {form.logoFiles?.length > 1
+                              ? `${form.logoFiles.length} ملفات مختارة`
+                              : form.logo?.name}
+                          </strong>
                           <button type="button" onClick={clearLogo}>
                             <HiOutlineX size={16} />
                             إزالة
@@ -373,8 +382,8 @@ export function CreateCompanyForm({ onSuccess }) {
                     ) : (
                       <label htmlFor="office-logo" className="register-upload__empty">
                         <HiOutlineUpload size={28} aria-hidden />
-                        <strong>اسحب الشعار هنا أو اضغط للرفع</strong>
-                        <small>PNG أو JPG أو SVG — بحد أقصى 2 ميجابايت</small>
+                        <strong>اسحب الملفات هنا أو اضغط للرفع</strong>
+                        <small>يمكنك اختيار عدة ملفات بجميع الصيغ (الحد الأقصى 2 ميجابايت للملف)</small>
                       </label>
                     )}
                   </div>

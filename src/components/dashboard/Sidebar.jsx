@@ -30,6 +30,7 @@ export function Sidebar({ open, onClose }) {
               <Icon name={item.icon} />
             </span>
             <span>{item.label}</span>
+            {item.badge && <span className="nav-link__badge">{item.badge}</span>}
           </NavLink>
         ))}
       </nav>
@@ -37,7 +38,7 @@ export function Sidebar({ open, onClose }) {
       <div className="sidebar__footer">
         <div>{firm.name}</div>
         <div style={{ marginTop: '0.35rem', color: 'rgba(212, 184, 110, 0.75)' }}>
-          {firm.phone}
+          <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{firm.phone}</span>
         </div>
       </div>
     </aside>

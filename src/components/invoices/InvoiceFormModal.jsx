@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FormSection, Field, FieldGrid, FormBanner } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
 import { FilterSelect } from '../ui/FilterSelect'
@@ -129,6 +130,7 @@ export function InvoiceFormModal({ open, invoice, onClose, onSave }) {
     >
       <form id="invoice-form" className="case-form" onSubmit={handleSubmit} noValidate>
         <FormBanner>{banner}</FormBanner>
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FormSection icon={<Icon name="invoices" />} title="معلومات الفاتورة">
           <FieldGrid cols={2}>
             <Field label="رقم الفاتورة" required>

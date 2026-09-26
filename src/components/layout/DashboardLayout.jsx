@@ -11,6 +11,7 @@ const titles = {
   ...Object.fromEntries(navItems.map((item) => [item.path, item.label])),
   '/profile': 'الملف الشخصي',
   '/notifications': 'الإشعارات',
+  '/manage-lists': 'إدارة القوائم والخيارات',
 }
 
 export function DashboardLayout() {

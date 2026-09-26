@@ -90,6 +90,14 @@ export async function fetchSessionCalendar({ month, year, ...params } = {}) {
 }
 
 /**
+ * GET /court-sessionsbyfiler — Filter court sessions
+ */
+export async function fetchSessionsByFilter(params = {}) {
+  const { data } = await apiClient.get('/court-sessionsbyfiler', { params })
+  return extractList(data)
+}
+
+/**
  * Map API court-session → UI shape used by SessionsPage / modals.
  */
 export function normalizeSession(s) {

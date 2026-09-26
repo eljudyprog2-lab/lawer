@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FormSection, Field, FieldGrid, FormBanner } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
 import { TimeField } from '../ui/TimeField'
@@ -109,6 +110,7 @@ export function SessionFormModal({
     >
       <form id="session-form" className="case-form" onSubmit={handleSubmit}>
         <FormBanner>{banner}</FormBanner>
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FormSection icon={<Icon name="cases" />} title="معلومات الجلسة">
           <FieldGrid cols={2}>
             <Field label="القضية" required full error={fieldErrors.caseId}>

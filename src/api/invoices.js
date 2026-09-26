@@ -90,6 +90,11 @@ export async function fetchInvoiceItems(params = {}) {
   return extractList(data)
 }
 
+export async function fetchInvoiceItem(id) {
+  const { data } = await apiClient.get(`${ITEMS_PATH}/${id}`)
+  return extractItem(data)
+}
+
 export async function createInvoiceItem(values) {
   const { data } = await apiClient.post(ITEMS_PATH, values)
   return extractItem(data)

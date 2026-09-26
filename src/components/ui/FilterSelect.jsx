@@ -20,9 +20,12 @@ export function FilterSelect({
   value,
   onChange,
   options = [],
+  placeholder = '',
   'aria-label': ariaLabel,
   className = '',
   disabled = false,
+  id,
+  name,
 }) {
   const [open, setOpen] = useState(false)
   const [coords, setCoords] = useState(null)
@@ -30,8 +33,10 @@ export function FilterSelect({
   const panelRef = useRef(null)
   const listId = useId()
   const selected =
-    options.find((opt) => String(opt.value) === String(value ?? '')) ?? options[0]
-  const isPlaceholder = selected != null && String(selected.value) === ''
+    options.find((opt) => String(opt.value) === String(value ?? '')) ??
+    (placeholder ? null : options[0])
+  const isPlaceholder = !selected || String(selected.value) === ''
+  const displayLabel = selected ? selected.label : (placeholder || '')
 
   useLayoutEffect(() => {
     if (!open || !rootRef.current) return undefined
@@ -71,7 +76,8 @@ export function FilterSelect({
   }, [open])
 
   const pick = (next) => {
-    onChange(String(next))
+    const val = String(next)
+    onChange?.(val, { target: { value: val, name } })
     setOpen(false)
   }
 
@@ -82,6 +88,8 @@ export function FilterSelect({
     >
       <button
         type="button"
+        id={id}
+        name={name}
         className="filter-dropdown__trigger"
         aria-label={ariaLabel}
         aria-haspopup="listbox"
@@ -91,7 +99,7 @@ export function FilterSelect({
         onClick={() => !disabled && setOpen((prev) => !prev)}
       >
         <span className={`filter-dropdown__label${isPlaceholder ? ' is-placeholder' : ''}`}>
-          {selected?.label ?? ''}
+          {displayLabel}
         </span>
         <HiChevronDown className="filter-dropdown__chevron" size={18} aria-hidden />
       </button>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { StatCard } from '../dashboard/StatCard'
 import { InvoiceFormModal } from '../invoices/InvoiceFormModal'
 import { InvoiceDetailsModal } from '../invoices/InvoiceDetailsModal'
@@ -85,6 +86,7 @@ export default function InvoicesPage() {
   const [editingId, setEditingId] = useState(null)
   const [detailsId, setDetailsId] = useState(null)
   const [paymentId, setPaymentId] = useState(null)
+  const [deletingInvoice, setDeletingInvoice] = useState(null)
   const [toast, setToast] = useState(null)
 
   useEffect(() => {
@@ -168,13 +170,15 @@ export default function InvoicesPage() {
     }
   }
 
-  const handleDelete = async (id) => {
+  const handleConfirmDelete = async () => {
+    if (!deletingInvoice) return
     try {
-      await remove.mutateAsync(id)
-      if (detailsId === id) setDetailsId(null)
-      if (editingId === id) setEditingId(null)
-      if (paymentId === id) setPaymentId(null)
-      showToast('تم حذف الفاتورة')
+      await remove.mutateAsync(deletingInvoice.id)
+      if (detailsId === deletingInvoice.id) setDetailsId(null)
+      if (editingId === deletingInvoice.id) setEditingId(null)
+      if (paymentId === deletingInvoice.id) setPaymentId(null)
+      showToast('تم حذف الفاتورة بنجاح')
+      setDeletingInvoice(null)
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
     }
@@ -370,7 +374,7 @@ export default function InvoicesPage() {
                                   type="button"
                                   className="action-btn action-btn--delete"
                                   title="حذف"
-                                  onClick={() => handleDelete(inv.id)}
+                                  onClick={() => setDeletingInvoice(inv)}
                                 >
                                   <Icon name="trash" size={16} />
                                 </button>
@@ -408,6 +412,25 @@ export default function InvoicesPage() {
         invoice={paymentInvoice}
         onClose={() => setPaymentId(null)}
         onSave={handleAddPayment}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingInvoice)}
+        onClose={() => setDeletingInvoice(null)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف الفاتورة"
+        message="هل أنت متأكد من رغبتك في حذف هذه الفاتورة نهائياً؟"
+        itemName={deletingInvoice ? `فاتورة رقم ${deletingInvoice.number || deletingInvoice.id}` : ''}
+        itemDetails={
+          deletingInvoice ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div><strong>الموكل:</strong> {deletingInvoice.clientName || '—'}</div>
+              <div><strong>الإجمالي:</strong> {formatMoney(deletingInvoice.total)}</div>
+            </div>
+          ) : null
+        }
+        warning="سيؤدي حذف الفاتورة إلى إزالة كافة بنودها وسجلات الدفعات المرتبطة بها نهائياً."
+        isLoading={remove.isPending}
       />
     </div>
   )

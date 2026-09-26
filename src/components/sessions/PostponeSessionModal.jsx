@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Icon } from '../ui/Icon'
 import { Field } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { DateField } from '../ui/DateField'
 import { formatDisplayDate } from '../../utils/formatDisplay'
 
 export function PostponeSessionModal({ open, session, onClose, onPostpone }) {
   const [date, setDate] = useState('')
   const [reason, setReason] = useState('')
+  const [errors, setErrors] = useState({})
 
   useEffect(() => {
     if (!open || !session) return
+    setErrors({})
     setDate(session.date || '')
     setReason('')
   }, [open, session])
@@ -19,7 +22,15 @@ export function PostponeSessionModal({ open, session, onClose, onPostpone }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!date.trim() || !reason.trim()) return
+    const errs = {}
+    if (!date.trim()) errs.date = 'تاريخ الجلسة الجديد مطلوب'
+    if (!reason.trim()) errs.reason = 'سبب تأجيل الجلسة مطلوب'
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+
     onPostpone(session.id, { date: date.trim(), reason: reason.trim() })
     onClose()
   }
@@ -41,6 +52,7 @@ export function PostponeSessionModal({ open, session, onClose, onPostpone }) {
       }
     >
       <form id="postpone-session-form" className="postpone-form" onSubmit={handleSubmit}>
+        <ValidationSummaryBox errors={errors} />
         <div className="postpone-form__summary">
           <Icon name="calendar" size={18} />
           <div>
@@ -54,7 +66,10 @@ export function PostponeSessionModal({ open, session, onClose, onPostpone }) {
         <Field label="التاريخ الجديد" required full>
           <DateField
             value={date}
-            onChange={setDate}
+            onChange={(val) => {
+              setDate(val)
+              setErrors((prev) => ({ ...prev, date: '' }))
+            }}
             aria-label="التاريخ الجديد"
             required
           />
@@ -66,7 +81,10 @@ export function PostponeSessionModal({ open, session, onClose, onPostpone }) {
             className="input input--area"
             rows={4}
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            onChange={(e) => {
+              setReason(e.target.value)
+              setErrors((prev) => ({ ...prev, reason: '' }))
+            }}
             placeholder="اكتب سبب تأجيل الجلسة..."
             required
           />

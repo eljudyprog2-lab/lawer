@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FilterSelect } from '../ui/FilterSelect'
 import { Field, FieldGrid, FormBanner } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import {
   clientStatusOptions,
   emptyClientForm,
@@ -112,6 +113,7 @@ export function ClientFormModal({
     >
       <form id="client-form" className="case-form" onSubmit={handleSubmit} noValidate>
         <FormBanner>{banner}</FormBanner>
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FieldGrid cols={1}>
           <Field label="الاسم الكامل" required error={fieldErrors.name}>
             <input

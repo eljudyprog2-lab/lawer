@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { FormSection, Field, FieldGrid } from '../ui/Form'
+import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
 import { emptyDocumentForm, documentTypeOptions } from '../../api/documents'
@@ -14,20 +15,32 @@ export function UploadDocumentModal({
   const [form, setForm] = useState(emptyDocumentForm)
   const [fileLabel, setFileLabel] = useState('لم يتم اختيار ملف')
   const [submitting, setSubmitting] = useState(false)
+  const [errors, setErrors] = useState({})
 
   const set = (key) => (e) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }))
+    setErrors((prev) => ({ ...prev, [key]: '' }))
   }
 
   const handleClose = () => {
     setForm(emptyDocumentForm)
     setFileLabel('لم يتم اختيار ملف')
+    setErrors({})
     onClose()
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.fileName || !form.description.trim() || !form.file) return
+    const errs = {}
+    if (!form.fileName?.trim()) errs.fileName = 'اسم المستند مطلوب'
+    if (!form.description?.trim()) errs.description = 'وصف المستند مطلوب'
+    if (!form.file && (!form.files || !form.files.length)) errs.file = 'يرجى اختيار ملف لرفعه'
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+
     setSubmitting(true)
     try {
       await onSave?.(form)
@@ -65,26 +78,37 @@ export function UploadDocumentModal({
       }
     >
       <form id="docs-upload-form" className="case-form" onSubmit={handleSubmit}>
+        <ValidationSummaryBox errors={errors} />
         <FormSection icon={<Icon name="documents" />} title="معلومات المستند">
           <FieldGrid cols={1}>
-            <Field label="اختر الملف" required>
+            <Field label="اختر الملفات" required>
               <div className="file-upload">
                 <label className="file-upload__btn">
-                  اختيار ملف
+                  اختيار ملفات
                   <input
                     type="file"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"
+                    multiple
+                    accept="*/*"
                     className="file-upload__input"
                     required
                     onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      setFileLabel(file ? file.name : 'لم يتم اختيار ملف')
+                      const files = Array.from(e.target.files || [])
+                      const count = files.length
+                      setFileLabel(
+                        count === 0
+                          ? 'لم يتم اختيار ملف'
+                          : count === 1
+                            ? files[0].name
+                            : `${count} ملفات مختارة`,
+                      )
                       setForm((prev) => ({
                         ...prev,
-                        file: file || null,
-                        fileName: file?.name || '',
-                        sizeBytes: file?.size || 0,
-                        mimeType: file?.type || '',
+                        file: files[0] || null,
+                        files,
+                        fileName: count === 1 ? files[0].name : count > 1 ? `${count} ملفات مختارة` : '',
+                        description: prev.description || (count === 1 ? files[0].name.replace(/\.[^/.]+$/, '') : prev.description),
+                        sizeBytes: files.reduce((acc, f) => acc + (f.size || 0), 0),
+                        mimeType: files[0]?.type || '',
                       }))
                     }}
                   />
@@ -92,7 +116,7 @@ export function UploadDocumentModal({
                 <span className="file-upload__name">{fileLabel}</span>
               </div>
               <p className="field__hint">
-                الأنواع المسموحة: PDF, Word, Excel, صور (الحد الأقصى: 10 ميجا)
+                يمكنك رفع ملف أو عدة ملفات (بجميع الصيغ)
               </p>
             </Field>
             <Field label="اسم/وصف المستند" required>
