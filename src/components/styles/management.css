@@ -638,43 +638,685 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   أنماط مصفوفة الصلاحيات (Permission Matrix Table)
+   أنماط مصفوفة الصلاحيات التفصيلية (Permission Matrix Table)
    ══════════════════════════════════════════════════════════════════ */
 .perm-matrix-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: right;
   font-size: 0.86rem;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
 .perm-matrix-table th {
   background: #f8fafc;
-  color: #334155;
-  font-weight: 800;
-  padding: 0.9rem 1rem;
+  color: #1e293b;
+  padding: 1rem 0.85rem;
   border-bottom: 2px solid #e2e8f0;
+  border-inline-start: 1px solid #f1f5f9;
+  vertical-align: middle;
 }
 
-.perm-matrix-table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f1f5f9;
+.perm-matrix-table th:first-child {
+  border-inline-start: none;
+}
+
+.perm-matrix-col-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: right;
+}
+
+.perm-matrix-col-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.perm-matrix-col-title {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.perm-matrix-col-sub {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.perm-matrix-col-count {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 0.12rem 0.5rem;
+  border-radius: 9999px;
+  margin-top: 0.25rem;
 }
 
 .perm-section-head td {
-  background: #f8fafc;
-  color: #0f172a;
-  font-weight: 800;
-  font-size: 0.9rem;
-  border-inline-start: 3px solid #1e293b;
-  padding: 0.75rem 1rem;
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 0.85rem 1.25rem;
+  border-top: 2px solid #e2e8f0;
+  border-bottom: 2px solid #e2e8f0;
+  border-right: 4px solid #1e293b !important;
 }
 
-.perm-checkbox {
-  width: 18px;
-  height: 18px;
-  accent-color: #10b981;
-  cursor: pointer;
+.perm-section-head__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
+
+.perm-section-head__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.perm-section-head__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #c4a35a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(30, 41, 59, 0.2);
+}
+
+.perm-section-head__badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.perm-matrix-table td {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  border-inline-start: 1px solid #f8fafc;
+  vertical-align: middle;
+  transition: all 0.15s ease;
+}
+
+.perm-matrix-table td:first-child {
+  border-inline-start: none;
+}
+
+.perm-matrix-table tr:hover td {
+  background: #fafcff;
+}
+
+.perm-matrix-table tr:hover td:first-child {
+  border-right: 3px solid #c4a35a;
+}
+
+.perm-action-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.perm-action-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.perm-matrix-table tr:hover .perm-action-icon-wrap {
+  background: #1e293b;
+  color: #c4a35a;
+  border-color: #1e293b;
+  transform: scale(1.05);
+}
+
+.perm-action-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.perm-action-desc {
+  font-size: 0.74rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+  line-height: 1.35;
+}
+
+/* ── مفتاح التبديل التفاعلي المطور (Ultra-Modern Interactive Permission Switch) ── */
+.perm-toggle-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 98px;
+  height: 34px;
+  padding: 3px 8px 3px 4px;
+  border-radius: 9999px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  outline: none;
+}
+
+.perm-toggle-chip:focus-visible {
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.25);
+}
+
+.perm-toggle-chip.is-active {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+  flex-direction: row-reverse;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.08);
+}
+
+.perm-toggle-chip.is-active:hover {
+  background: #d1fae5;
+  border-color: #34d399;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.18);
+  transform: translateY(-1px);
+}
+
+.perm-toggle-chip.is-active .perm-toggle-chip__box {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #059669;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(5, 150, 105, 0.35);
+  transition: all 0.2s ease;
+}
+
+.perm-toggle-chip.is-disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  flex-direction: row;
+}
+
+.perm-toggle-chip.is-disabled:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #64748b;
+  transform: translateY(-1px);
+}
+
+.perm-toggle-chip.is-disabled .perm-toggle-chip__box {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.perm-toggle-chip__label {
+  line-height: 1;
+  padding: 0 4px;
+}
+
+/* ── شريط رأس الصلاحيات المخصص المطابق للقطة المرجعية ── */
+.perm-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 64px;
+  padding: 0.75rem 1.75rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.perm-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.perm-topbar__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #1e293b;
+  color: #c4a35a;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15);
+}
+
+.perm-topbar__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+}
+
+.perm-topbar__subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.76rem;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+.perm-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.perm-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.25rem 0.65rem 0.25rem 0.35rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.perm-user-chip:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.perm-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #1e293b;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.82rem;
+  box-shadow: 0 2px 6px rgba(30, 41, 59, 0.2);
+}
+
+.perm-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.perm-user-name {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.84rem;
+  color: #0f172a;
+}
+
+.perm-user-role {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.perm-bell-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.perm-bell-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.perm-bell-dot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  border: 1.5px solid #ffffff;
+}
+
+/* ── تقسيم الشاشة الكامل (Full Screen Split Layout) ── */
+.mgmt-screen-split {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  direction: rtl;
+  background: #f8fafc;
+  align-items: stretch;
+}
+
+.mgmt-main-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mgmt-main-content {
+  flex: 1;
+  padding: 1.5rem 1.75rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* لوحة سجل التدقيق الأمني الجانبية (Left Side Audit Log Panel) */
+.mgmt-audit-sidebar {
+  width: 330px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-inline-end: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.02);
+}
+
+.mgmt-audit-sidebar__head {
+  height: 64px;
+  padding: 0 1rem;
+  background: #1e293b;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.mgmt-audit-sidebar__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffffff;
+}
+
+.mgmt-audit-sidebar__title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.mgmt-audit-sidebar__close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.mgmt-audit-sidebar__close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mgmt-audit-sidebar__search {
+  padding: 0.85rem 1rem 0.5rem;
+  position: relative;
+}
+
+.mgmt-audit-sidebar__search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 2.2rem 0 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+  direction: rtl;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mgmt-audit-sidebar__search input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.mgmt-audit-sidebar__search-icon {
+  position: absolute;
+  right: 1.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.mgmt-audit-sidebar__list {
+  padding: 0.5rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.mgmt-audit-entry-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mgmt-audit-entry-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.mgmt-audit-entry-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.mgmt-audit-entry-card__time {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 500;
+  direction: ltr;
+}
+
+.mgmt-audit-entry-card__title {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.mgmt-audit-entry-card__desc {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.audit-user-highlight {
+  background: #e0f2fe;
+  color: #0284c7;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.mgmt-audit-entry-card__sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mgmt-audit-sidebar__footer {
+  padding: 0.85rem 1rem;
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.mgmt-audit-export-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.mgmt-audit-export-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* ── شبكة الإحصائيات الأربع الدقيقة (Exact 4 Stat Boxes) ── */
+.mgmt-stat-cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.mgmt-stat-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mgmt-stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.mgmt-stat-box__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mgmt-stat-box__val {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.1;
+  font-family: var(--font-display);
+}
+
+.mgmt-stat-box__val--sm {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.mgmt-stat-box__label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.mgmt-stat-box__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.mgmt-stat-box__icon--amber { background: #fef3c7; color: #d97706; }
+.mgmt-stat-box__icon--green { background: #ecfdf5; color: #059669; }
+.mgmt-stat-box__icon--blue { background: #eff6ff; color: #2563eb; }
+.mgmt-stat-box__icon--cyan { background: #f0fdfa; color: #0d9488; }
+
+/* أيقونات أدوار جدول الصلاحيات الملونة المعتمدة */
+.mgmt-role-icon--rose { background: #fee2e2; color: #b91c1c; }
+.mgmt-role-icon--amber { background: #fef3c7; color: #b45309; }
+.mgmt-role-icon--blue { background: #e0f2fe; color: #0369a1; }
+.mgmt-role-icon--purple { background: #f3e8ff; color: #6b21a8; }
 
 /* ── استجابة الشاشات (Responsive) ── */
 @media (max-width: 1080px) {

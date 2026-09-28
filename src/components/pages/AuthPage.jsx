@@ -1,9 +1,8 @@
 import { useState, useRef } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { HiOutlinePhone, HiOutlineMail, HiOutlineLockClosed } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
-import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { useAuth } from '../../context/AuthContext'
 import { firm } from '../../data/dashboard'
 import loginHeroImg from '../../assets/login.jpg'
@@ -20,12 +19,13 @@ const authRoleCards = [
   { id: 'client', label: 'موكل', icon: 'person' },
   { id: 'admin', label: 'إدارة', icon: 'cog' },
   { id: 'lawyer', label: 'محامي', icon: 'lawyers' },
+  { id: 'accountant', label: 'محاسب', icon: 'calculator' },
 ]
 
 const emptyLogin = { email: '', password: '' }
 
 export default function AuthPage() {
-  const { isAuthenticated, login, toast } = useAuth()
+  const { isAuthenticated, login } = useAuth()
   const navigate = useNavigate()
 
   // Login form state
@@ -247,13 +247,6 @@ export default function AuthPage() {
                 ) : null}
               </label>
 
-              {/* صندوق ملخص أخطاء التحقق */}
-              <ValidationSummaryBox
-                errors={{
-                  ...loginFieldErrors,
-                  submit: loginSubmitError,
-                }}
-              />
 
               {/* زر الدخول */}
               <button
@@ -346,20 +339,6 @@ export default function AuthPage() {
         </aside>
       </div>
 
-      {/* تنبيهات النظام Toast */}
-      <AnimatePresence>
-        {toast ? (
-          <motion.div
-            className={`auth-toast auth-toast--${toast.tone}`}
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
-            <Icon name={toast.tone === 'error' ? 'alert' : 'check'} size={18} />
-            {toast.message}
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
     </div>
   )
 }

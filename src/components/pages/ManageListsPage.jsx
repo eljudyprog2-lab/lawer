@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
 import { useLookupOverview } from '../../hooks/useLookups'
+import { useToast } from '../../context/ToastContext'
 
 export default function ManageListsPage() {
   const {
@@ -16,12 +17,7 @@ export default function ManageListsPage() {
 
   const [activeTab, setActiveTab] = useState('all')
   const [query, setQuery] = useState('')
-  const [toast, setToast] = useState(null)
-
-  const showToast = (text, tone = 'success') => {
-    setToast({ text, tone })
-    setTimeout(() => setToast(null), 3500)
-  }
+  const { showToast } = useToast()
 
   // Filter groups
   const filteredGroups = useMemo(() => {
@@ -76,28 +72,6 @@ export default function ManageListsPage() {
         </div>
       </div>
 
-      {/* ── Toast notification ── */}
-      {toast ? (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
-            padding: '0.75rem 1.15rem',
-            borderRadius: '12px',
-            background: toast.tone === 'error' ? '#fef2f2' : '#ecfdf5',
-            color: toast.tone === 'error' ? '#991b1b' : '#065f46',
-            border: `1px solid ${toast.tone === 'error' ? '#fecaca' : '#a7f3d0'}`,
-            fontSize: '0.88rem',
-            fontWeight: 700,
-          }}
-        >
-          <Icon name={toast.tone === 'error' ? 'alert' : 'check'} size={18} />
-          <span>{toast.text}</span>
-        </div>
-      ) : null}
 
       {/* ── Error Banner ── */}
       {error ? (
@@ -213,34 +187,16 @@ export default function ManageListsPage() {
             </button>
           </div>
 
-          <div style={{ position: 'relative', width: '280px' }}>
-            <span
-              style={{
-                position: 'absolute',
-                right: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#94a3b8',
-              }}
-            >
-              <Icon name="search" size={16} />
-            </span>
+          <div className="search-field" style={{ width: '280px' }}>
+            <Icon name="search" className="search-field__icon" />
             <input
               type="search"
+              className="search-field__input"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="بحث في مجموعات الخيارات..."
-              style={{
-                width: '100%',
-                height: '40px',
-                padding: '0 2.25rem 0 0.85rem',
-                border: '1.5px solid #e2e8f0',
-                borderRadius: '10px',
-                background: '#ffffff',
-                color: '#0f172a',
-                fontSize: '0.84rem',
-                outline: 'none',
-              }}
+              aria-label="بحث في مجموعات الخيارات"
+              style={{ width: '100%' }}
             />
           </div>
         </div>

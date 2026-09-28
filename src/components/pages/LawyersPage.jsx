@@ -6,6 +6,7 @@ import { HiOutlineRefresh, HiOutlineExclamationCircle } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { LawyerFormModal } from '../lawyers/LawyerFormModal'
+import { useToast } from '../../context/ToastContext'
 import {
   fetchLawyers,
   createLawyer,
@@ -26,11 +27,11 @@ function statusClass(status) {
 
 export default function LawyersPage() {
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const [lawyers, setLawyers] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
-  const [toast, setToast] = useState(null)
   const [query, setQuery] = useState('')
   const [formOpen, setFormOpen] = useState(false)
   const [formMode, setFormMode] = useState('add')
@@ -38,8 +39,6 @@ export default function LawyersPage() {
   const [saving, setSaving] = useState(false)
   const [deletingLawyer, setDeletingLawyer] = useState(null)
   const [deletingLoading, setDeletingLoading] = useState(false)
-
-  const showToast = (text, tone = 'success') => setToast({ text, tone })
 
   const loadLawyers = useCallback(async ({ silent = false } = {}) => {
     if (silent) setRefreshing(true)
@@ -60,11 +59,6 @@ export default function LawyersPage() {
     loadLawyers()
   }, [loadLawyers])
 
-  useEffect(() => {
-    if (!toast) return undefined
-    const id = window.setTimeout(() => setToast(null), 3200)
-    return () => window.clearTimeout(id)
-  }, [toast])
 
   const hasActiveFilters = Boolean(query.trim())
 
@@ -191,21 +185,6 @@ export default function LawyersPage() {
           </button>
         </div>
       </div>
-
-      {/* Toast */}
-      {toast ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className={
-            toast.tone === 'success'
-              ? 'mb-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800'
-              : 'mb-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800'
-          }
-        >
-          <p className="font-medium">{toast.text}</p>
-        </div>
-      ) : null}
 
       {/* Loading */}
       {loading ? (

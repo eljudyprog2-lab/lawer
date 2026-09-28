@@ -113,6 +113,8 @@ export function normalizeSession(s) {
     caseId: s.case_id != null ? String(s.case_id) : '',
     caseTitle: legalCase?.title ?? '—',
     caseNumber: legalCase?.case_number ?? '',
+    clientName: legalCase?.client?.full_name ?? legalCase?.client?.name ?? '',
+    opponentName: legalCase?.opponent_name ?? s.opponent_name ?? '',
     court: s.court_name ?? '',
     circuit: s.court_circuit ?? '',
     judge: s.judge_name ?? '',

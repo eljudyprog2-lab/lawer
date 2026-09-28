@@ -43,10 +43,19 @@ import {
   HiOutlineLockClosed,
   HiOutlinePhone,
   HiOutlineMail,
+  HiOutlineVideoCamera,
+  HiOutlineScale,
+  HiOutlineDocumentDuplicate,
+  HiOutlineDotsVertical,
+  HiOutlineFilter,
+  HiOutlineChevronDown,
+  HiOutlineCalculator,
 } from 'react-icons/hi'
 
 const map = {
   home: HiOutlineHome,
+  calculator: HiOutlineCalculator,
+  accountant: HiOutlineCalculator,
   cases: HiOutlineCollection,
   sessions: HiOutlineBriefcase,
   appointments: HiOutlineCalendar,
@@ -93,6 +102,12 @@ const map = {
   lock: HiOutlineLockClosed,
   phone: HiOutlinePhone,
   mail: HiOutlineMail,
+  video: HiOutlineVideoCamera,
+  scale: HiOutlineScale,
+  duplicate: HiOutlineDocumentDuplicate,
+  dots: HiOutlineDotsVertical,
+  filter: HiOutlineFilter,
+  chevronDown: HiOutlineChevronDown,
 }
 
 export function Icon({ name, className, size }) {

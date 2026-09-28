@@ -42,8 +42,12 @@ export function AppRoutes() {
             <Route path="clients" element={<ClientsPage />} />
             <Route path="clients/:id" element={<ClientDetailPage />} />
           </Route>
-          <Route path="accounts" element={<AccountsPage />} />
-          <Route path="permissions" element={<PermissionsPage />} />
+          <Route element={<RoleRoute navId="accounts" />}>
+            <Route path="accounts" element={<AccountsPage />} />
+          </Route>
+          <Route element={<RoleRoute navId="permissions" />}>
+            <Route path="permissions" element={<PermissionsPage />} />
+          </Route>
           <Route element={<RoleRoute navId="manage-lists" />}>
             <Route path="manage-lists" element={<ManageListsPage />} />
             <Route path="manage-lists/:listKey" element={<ListDetailPage />} />

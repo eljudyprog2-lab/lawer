@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Pagination } from '../ui/Pagination'
 import { usePagination } from '../../hooks/usePagination'
 import { HiOutlineRefresh, HiOutlineExclamationCircle } from 'react-icons/hi'
@@ -16,6 +16,7 @@ import {
 } from '../../hooks/useCases'
 import { useClients } from '../../hooks/useClients'
 import { useLawyers } from '../../hooks/useLawyers'
+import { useToast } from '../../context/ToastContext'
 import { buildDocumentFormData, createCaseDocument } from '../../api/documents'
 
 function statusClass(status) {
@@ -53,19 +54,11 @@ export default function CasesPage() {
   const { lawyers } = useLawyers()
   const { create, remove } = useCaseMutations()
 
-  const [toast, setToast] = useState(null)
+  const { showToast } = useToast()
   const [query, setQuery] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [selectedCase, setSelectedCase] = useState(null)
   const [deletingCase, setDeletingCase] = useState(null)
-
-  const showToast = (text, tone = 'success') => setToast({ text, tone })
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const id = window.setTimeout(() => setToast(null), 3200)
-    return () => window.clearTimeout(id)
-  }, [toast])
 
   const lawyerNameById = useMemo(() => {
     const map = new Map()
@@ -202,20 +195,6 @@ export default function CasesPage() {
         </div>
       </div>
 
-      {/* Toast */}
-      {toast ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className={
-            toast.tone === 'success'
-              ? 'mb-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800'
-              : 'mb-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800'
-          }
-        >
-          <p className="font-medium">{toast.text}</p>
-        </div>
-      ) : null}
 
       {/* Loading */}
       {loading ? (

@@ -7,7 +7,7 @@ function statusClass(status) {
   return 'status-pill status-pill--active'
 }
 
-export function ClientCasesModal({ open, client, cases = [], onClose }) {
+export function ClientCasesModal({ open, client, cases = [], onClose, onViewCase }) {
   if (!client) return null
 
   return (
@@ -56,10 +56,16 @@ export function ClientCasesModal({ open, client, cases = [], onClose }) {
                     </span>
                   </td>
                   <td>
-                    <span className="client-case-view">
-                      <Icon name="clock" size={14} />
-                      عرض
-                    </span>
+                    <button
+                      type="button"
+                      className="client-case-view"
+                      onClick={() => onViewCase?.(item)}
+                      title="عرض تفاصيل القضية"
+                      aria-label={`عرض تفاصيل قضية ${item.number || item.title}`}
+                    >
+                      <Icon name="eye" size={14} />
+                      <span>عرض</span>
+                    </button>
                   </td>
                 </tr>
               ))

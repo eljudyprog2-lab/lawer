@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { useUsers, useUserMutations } from '../../hooks/useUsers'
 import { UserFormModal } from '../users/UserFormModal'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
@@ -19,7 +20,7 @@ export default function AccountsPage() {
   // State
   const [activeTab, setActiveTab] = useState('all') // all | lawyers | clients | admin
   const [searchQuery, setSearchQuery] = useState('')
-  const [toast, setToast] = useState(null)
+  const { showToast } = useToast()
 
   // Modals state
   const [userModalOpen, setUserModalOpen] = useState(false)
@@ -28,11 +29,6 @@ export default function AccountsPage() {
   const [deletingUser, setDeletingUser] = useState(null)
   const [deactivatingUser, setDeactivatingUser] = useState(null)
   const [submittingAction, setSubmittingAction] = useState(false)
-
-  const showToast = (message, tone = 'success') => {
-    setToast({ message, tone })
-    setTimeout(() => setToast(null), 3500)
-  }
 
   // User Counts
   const { totalCount, lawyersCount, clientsCount, adminCount } = useMemo(() => {
@@ -147,33 +143,16 @@ export default function AccountsPage() {
 
         <div className="mgmt-topbar__actions">
           {/* حقل البحث السريع */}
-          <div style={{ position: 'relative', width: '260px' }}>
-            <span
-              style={{
-                position: 'absolute',
-                right: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-muted)',
-              }}
-            >
-              <Icon name="search" size={16} />
-            </span>
+          <div className="search-field" style={{ width: '280px' }}>
+            <Icon name="search" className="search-field__icon" />
             <input
-              type="text"
+              type="search"
+              className="search-field__input"
               placeholder="بحث بالاسم أو البريد..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                height: '40px',
-                padding: '0 2.2rem 0 0.75rem',
-                border: '1.5px solid var(--border)',
-                borderRadius: '10px',
-                fontSize: '0.84rem',
-                outline: 'none',
-                background: '#fff',
-              }}
+              aria-label="بحث في المستخدمين والحسابات"
+              style={{ width: '100%' }}
             />
           </div>
 
@@ -206,28 +185,6 @@ export default function AccountsPage() {
         </div>
       </header>
 
-      {/* ── Toast Alert ── */}
-      {toast && (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
-            padding: '0.75rem 1.15rem',
-            borderRadius: '12px',
-            background: toast.tone === 'error' ? '#fef2f2' : '#ecfdf5',
-            color: toast.tone === 'error' ? '#991b1b' : '#065f46',
-            border: `1px solid ${toast.tone === 'error' ? '#fecaca' : '#a7f3d0'}`,
-            fontSize: '0.88rem',
-            fontWeight: 700,
-          }}
-        >
-          <Icon name={toast.tone === 'error' ? 'alert' : 'check'} size={18} />
-          <span>{toast.message}</span>
-        </div>
-      )}
 
       {/* ── بطاقة المستخدم الحالي المعتمد (Current User Banner) ── */}
       <section className="mgmt-user-banner" aria-label="المستخدم الحالي">

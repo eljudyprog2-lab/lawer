@@ -160,12 +160,26 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.35rem 0.7rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 10px;
   background: linear-gradient(145deg, #4d8fd4, #3a6ea5);
   color: #fff;
   font-size: 0.78rem;
   font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+}
+
+.client-case-view:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(58, 110, 165, 0.35);
+  filter: brightness(1.08);
+}
+
+.client-case-view:active {
+  transform: translateY(0);
 }
 
 .client-cases-mini {

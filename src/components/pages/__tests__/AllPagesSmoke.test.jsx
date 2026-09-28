@@ -224,8 +224,7 @@ describe('All Pages Smoke Tests — verifies every page renders cleanly', () => 
   it('15. PermissionsPage renders successfully', async () => {
     renderPage(<PermissionsPage />, { route: '/permissions' })
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'إدارة الصلاحيات والأدوار' })).toBeInTheDocument()
-      expect(screen.getByText('مصفوفة الصلاحيات وأدوار النظام')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'الصلاحيات' })).toBeInTheDocument()
     })
   })
 

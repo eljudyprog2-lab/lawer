@@ -8,18 +8,14 @@ import {
 import { parseApiError, registerUserViaApi } from '../api/users'
 import { queryClient } from '../lib/queryClient'
 import { userKeys } from '../hooks/queryKeys'
+import { useToast } from './ToastContext'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => readAuthSession())
-  const [toast, setToast] = useState(null)
   const [registering, setRegistering] = useState(false)
-
-  const showToast = useCallback((message, tone = 'success') => {
-    setToast({ message, tone })
-    window.setTimeout(() => setToast(null), 2800)
-  }, [])
+  const { showToast } = useToast()
 
   const login = useCallback(
     async (payload) => {
@@ -129,10 +125,13 @@ export function AuthProvider({ children }) {
     })
   }, [])
 
+  const isAdmin = user?.roleId === 'admin' || user?.roleId === 'owner'
+
   const value = useMemo(
     () => ({
       user,
       isAuthenticated: Boolean(user),
+      isAdmin,
       company_id: user?.company_id ?? null,
       login,
       register,
@@ -140,9 +139,9 @@ export function AuthProvider({ children }) {
       logout,
       setCompany,
       updateUserProfile,
-      toast,
+      showToast,
     }),
-    [user, login, register, registering, logout, setCompany, updateUserProfile, toast],
+    [user, isAdmin, login, register, registering, logout, setCompany, updateUserProfile, showToast],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

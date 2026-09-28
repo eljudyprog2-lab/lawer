@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   HiOutlineExclamationCircle,
   HiOutlineOfficeBuilding,
@@ -19,28 +19,23 @@ import {
   statusLabel,
 } from '../../api/companies'
 import { useCompanies } from '../../hooks/useCompanies'
+import { useToast } from '../../context/ToastContext'
 
 /**
  * Super-Admin SaaS dashboard for multi-tenant law-firm (Company) management.
  */
 export default function CompaniesPage() {
   const { companies, isLoading, isFetching, error, refetch } = useCompanies()
+  const { showToast } = useToast()
   const [query, setQuery] = useState('')
   const [planFilter, setPlanFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [toast, setToast] = useState(null)
 
   const [formOpen, setFormOpen] = useState(false)
   const [formMode, setFormMode] = useState('add')
   const [editingCompany, setEditingCompany] = useState(null)
   const [detailsCompany, setDetailsCompany] = useState(null)
   const [deletingCompany, setDeletingCompany] = useState(null)
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const id = window.setTimeout(() => setToast(null), 3200)
-    return () => window.clearTimeout(id)
-  }, [toast])
 
   const metrics = useMemo(() => computeTenantMetrics(companies), [companies])
 
@@ -86,8 +81,6 @@ export default function CompaniesPage() {
     setEditingCompany(company)
     setFormOpen(true)
   }
-
-  const showToast = (text, tone = 'success') => setToast({ text, tone })
 
   const handleFormSuccess = async (saved, mode) => {
     const name = saved?.name || editingCompany?.name || 'المكتب'
@@ -138,20 +131,6 @@ export default function CompaniesPage() {
 
       <SaaSMetricsCards metrics={metrics} loading={isLoading} />
 
-      {/* Toast */}
-      {toast ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className={
-            toast.tone === 'success'
-              ? 'mb-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800'
-              : 'mb-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800'
-          }
-        >
-          <p className="font-medium">{toast.text}</p>
-        </div>
-      ) : null}
 
       {/* Filters */}
       <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[#d5e0e0] bg-white p-3 shadow-[0_8px_24px_rgba(30,58,60,0.06)] sm:flex-row sm:items-center sm:justify-between">

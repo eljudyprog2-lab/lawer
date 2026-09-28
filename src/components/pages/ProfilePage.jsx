@@ -23,6 +23,7 @@ import { ConfirmModal } from '../ui/ConfirmModal'
 import { EditProfileModal } from '../profile/EditProfileModal'
 import { ChangePasswordModal } from '../profile/ChangePasswordModal'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { useCases } from '../../hooks/useCases'
 import { useSessions } from '../../hooks/useSessions'
 import { useClients } from '../../hooks/useClients'
@@ -54,7 +55,7 @@ export default function ProfilePage() {
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [passwordModalOpen, setPasswordModalOpen] = useState(false)
   const [submittingEdit, setSubmittingEdit] = useState(false)
-  const [toastMessage, setToastMessage] = useState(null)
+  const { showToast } = useToast()
 
   // Dynamic Devices State
   const [devices, setDevices] = useState([
@@ -77,11 +78,6 @@ export default function ProfilePage() {
       type: 'mobile',
     },
   ])
-
-  const showToast = (msg) => {
-    setToastMessage(msg)
-    setTimeout(() => setToastMessage(null), 3200)
-  }
 
   // Profile data
   const profile = useMemo(() => {
@@ -164,32 +160,6 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      {/* ── Toast Alert ── */}
-      {toastMessage && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            left: '24px',
-            zIndex: 9999,
-            background: 'var(--brand-teal)',
-            color: '#ffffff',
-            padding: '0.85rem 1.4rem',
-            borderRadius: '12px',
-            fontWeight: 700,
-            fontSize: '0.9rem',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
-            animation: 'fadeIn 0.25s ease',
-          }}
-        >
-          <HiOutlineCheckCircle size={20} color="var(--brand-gold)" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
       {/* ── مسار التنقل وحالة الاتصال (Top Bar) ── */}
       <div className="profile-topbar">
         <div className="profile-breadcrumbs">
@@ -460,125 +430,6 @@ export default function ProfilePage() {
                   تمت مزامنة رخصة المحاماة وبيانات القيد المهني مباشرة مع بوابة «ناجز» ووزارة العدل بالمملكة العربية السعودية. لا يتطلب الحساب أي إجراء تجديد حالياً.
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* العمود الأيسر (أمان الحساب، الأجهزة، والأرشفة) */}
-          <div className="profile-col-side">
-            {/* بطاقة أمان الحساب والنفاذ الوطني */}
-            <div className="profile-panel-card">
-              <header className="profile-panel-card__head">
-                <h2 className="profile-panel-card__title">
-                  <HiOutlineShieldCheck size={20} color="var(--brand-teal)" />
-                  <span>أمان الحساب والنفاذ الوطني</span>
-                </h2>
-                <span className="profile-security-badge-top">محمي للغاية</span>
-              </header>
-
-              <div className="profile-security-item">
-                <div className="profile-security-item__content">
-                  <span className="profile-security-item__title">النفاذ الوطني الموحد</span>
-                  <span className="profile-security-item__desc">تم التوثيق بالبصمة الحيوية</span>
-                </div>
-                <div className="profile-security-item__tags">
-                  <span className="profile-hero__status-tag">
-                    <HiOutlineCheck size={12} /> مفعل
-                  </span>
-                  <span className="profile-nafath-tag">نفاذ</span>
-                </div>
-              </div>
-
-              <div className="profile-security-item">
-                <div className="profile-security-item__content">
-                  <span className="profile-security-item__title">التحقق بخطوتين (OTP)</span>
-                  <span className="profile-security-item__desc">عبر رسائل الجوال وتطبيق الأمان</span>
-                </div>
-                <div className="profile-security-item__tags">
-                  <span className="profile-hero__status-tag">
-                    <HiOutlineCheck size={12} /> نشط
-                  </span>
-                  <span className="profile-2fa-tag">2FA</span>
-                </div>
-              </div>
-
-              {/* مقياس قوة كلمة المرور */}
-              <div className="profile-pw-strength-block">
-                <div className="profile-pw-strength-head">
-                  <span style={{ fontWeight: 700, color: 'var(--text)' }}>قوة كلمة المرور:</span>
-                  <span style={{ fontWeight: 800, color: 'var(--success, #2d8a5e)' }}>
-                    قوية جداً (16 خانة)
-                  </span>
-                </div>
-                <div className="profile-pw-strength-meter">
-                  <div className="profile-pw-strength-fill" style={{ width: '100%' }} />
-                </div>
-                <span className="profile-pw-subtext">آخر تغيير لكلمة المرور قبل 38 يوماً</span>
-              </div>
-            </div>
-
-            {/* بطاقة الجلسات والأجهزة المتصلة */}
-            <div className="profile-panel-card">
-              <header className="profile-panel-card__head">
-                <h2 className="profile-panel-card__title">
-                  <span>الجلسات والأجهزة المتصلة</span>
-                </h2>
-                <button
-                  type="button"
-                  className="profile-devices-head-btn"
-                  onClick={() => setConfirmTerminateAllOpen(true)}
-                >
-                  إنهاء جميع الجلسات
-                </button>
-              </header>
-
-              {devices.map((dev) => (
-                <div key={dev.id} className="profile-device-box">
-                  <div className="profile-device-box__icon">
-                    {dev.type === 'desktop' ? (
-                      <HiOutlineDesktopComputer size={20} />
-                    ) : (
-                      <HiOutlineDeviceMobile size={20} />
-                    )}
-                  </div>
-                  <div className="profile-device-box__info">
-                    <div className="profile-device-box__name-row">
-                      <span className="profile-device-box__name">{dev.name}</span>
-                      {dev.isCurrent && (
-                        <span className="profile-field-item__badge profile-field-item__badge--emerald">
-                          الجلسة الحالية
-                        </span>
-                      )}
-                    </div>
-                    <span className="profile-device-box__meta">
-                      IP: {dev.ip} • {dev.location}
-                    </span>
-                    <span className="profile-device-box__status">
-                      {dev.isCurrent ? `النشاط: ${dev.activity}` : `آخر ظهور: ${dev.lastSeen}`}
-                    </span>
-                  </div>
-                  {!dev.isCurrent && (
-                    <button
-                      type="button"
-                      className="profile-device-box__close"
-                      title="إنهاء هذه الجلسة"
-                      onClick={() => handleTerminateDevice(dev.id)}
-                    >
-                      <HiOutlineX size={16} />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* صندوق الأرشفة المشفرة */}
-            <div className="profile-archive-box">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontWeight: 800, color: 'var(--brand-teal)' }}>
-                <HiOutlineLockClosed size={16} />
-                <span>أرشفة إلكترونية معتمدة</span>
-              </div>
-              <p style={{ margin: 0 }}>
-                سجل العمليات القضائية يخضع للأرشفة الرقمية المشفرة وفق اللائحة التنفيذية لنظام المعاملات الإلكترونية السعودي.
-              </p>
             </div>
           </div>
         </div>

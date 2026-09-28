@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
@@ -10,6 +10,7 @@ import { AssignLawyerModal } from '../appointments/AssignLawyerModal'
 import { ConfirmAppointmentModal } from '../appointments/ConfirmAppointmentModal'
 import { RescheduleAppointmentModal } from '../appointments/RescheduleAppointmentModal'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { isSamePerson } from '../../data/roles'
 import { useAppointments, useAppointmentMutations } from '../../hooks/useAppointments'
 import { useClients } from '../../hooks/useClients'
@@ -28,6 +29,7 @@ import { isValidDateOrder, MSG } from '../../utils/validation'
 
 export default function AppointmentsPage() {
   const { user } = useAuth()
+  const { showToast } = useToast()
   const isLawyer = user?.roleId === 'lawyer'
   const isClient = user?.roleId === 'client'
   const isAdmin = !isLawyer && !isClient
@@ -51,15 +53,6 @@ export default function AppointmentsPage() {
   const [confirmId, setConfirmId] = useState(null)
   const [rescheduleId, setRescheduleId] = useState(null)
   const [deletingAppointment, setDeletingAppointment] = useState(null)
-  const [toast, setToast] = useState(null)
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const id = window.setTimeout(() => setToast(null), 3200)
-    return () => window.clearTimeout(id)
-  }, [toast])
-
-  const showToast = (text, tone = 'success') => setToast({ text, tone })
 
   const clientOptions = useMemo(
     () => clients.map((item) => ({ id: String(item.id), name: item.name })),
@@ -289,19 +282,6 @@ export default function AppointmentsPage() {
         </button>
       </div>
 
-      {toast ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className={
-            toast.tone === 'success'
-              ? 'mb-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800'
-              : 'mb-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800'
-          }
-        >
-          <p className="font-medium">{toast.text}</p>
-        </div>
-      ) : null}
 
       <section className="appointments-filters">
         <div className="appointments-filters__grid">

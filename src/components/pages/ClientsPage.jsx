@@ -7,6 +7,7 @@ import { Icon } from '../ui/Icon'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { ClientFormModal } from '../clients/ClientFormModal'
 import { ClientCasesModal } from '../clients/ClientCasesModal'
+import { CaseDetailsModal } from '../cases/CaseDetailsModal'
 import {
   fetchClients,
   createClient,
@@ -20,6 +21,7 @@ import {
 import { caseStatusLabel } from '../../api/cases'
 import { getStoredCompanyId } from '../../api/client'
 import { useCases } from '../../hooks/useCases'
+import { useToast } from '../../context/ToastContext'
 
 function statusClass(status) {
   if (status === 'نشط') return 'status-pill status-pill--active'
@@ -29,22 +31,21 @@ function statusClass(status) {
 
 export default function ClientsPage() {
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const { cases: allCases } = useCases()
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
-  const [toast, setToast] = useState(null)
   const [query, setQuery] = useState('')
   const [formOpen, setFormOpen] = useState(false)
   const [formMode, setFormMode] = useState('add')
   const [editingClient, setEditingClient] = useState(null)
   const [casesClient, setCasesClient] = useState(null)
+  const [selectedCase, setSelectedCase] = useState(null)
   const [saving, setSaving] = useState(false)
   const [deletingClient, setDeletingClient] = useState(null)
   const [deletingLoading, setDeletingLoading] = useState(false)
-
-  const showToast = (text, tone = 'success') => setToast({ text, tone })
 
   const loadClients = useCallback(async ({ silent = false } = {}) => {
     if (silent) setRefreshing(true)
@@ -65,11 +66,6 @@ export default function ClientsPage() {
     loadClients()
   }, [loadClients])
 
-  useEffect(() => {
-    if (!toast) return undefined
-    const id = window.setTimeout(() => setToast(null), 3200)
-    return () => window.clearTimeout(id)
-  }, [toast])
 
   const casesByClientId = useMemo(() => {
     const map = new Map()
@@ -82,6 +78,7 @@ export default function ClientsPage() {
         number: c.case_number || c.number,
         title: c.title,
         status: caseStatusLabel(c.status),
+        raw: c,
       })
     }
     return map
@@ -224,21 +221,6 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      {/* Toast */}
-      {toast ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className={
-            toast.tone === 'success'
-              ? 'mb-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800'
-              : 'mb-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800'
-          }
-        >
-          <p className="font-medium">{toast.text}</p>
-        </div>
-      ) : null}
-
       {/* Loading */}
       {loading ? (
         <div className="table-card flex flex-col items-center justify-center gap-3 py-16 text-[#6b7f80]">
@@ -374,6 +356,17 @@ export default function ClientsPage() {
         client={casesClient}
         cases={casesByClientId.get(casesClient?.id) ?? []}
         onClose={() => setCasesClient(null)}
+        onViewCase={(caseItem) => {
+          const full = allCases.find((c) => String(c.id) === String(caseItem.id)) || caseItem.raw || caseItem
+          setSelectedCase(full)
+        }}
+      />
+
+      <CaseDetailsModal
+        open={Boolean(selectedCase)}
+        caseData={selectedCase}
+        onClose={() => setSelectedCase(null)}
+        readOnly={false}
       />
 
       <ConfirmDeleteModal

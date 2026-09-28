@@ -67,7 +67,7 @@
 .cases-toolbar__actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
@@ -79,23 +79,24 @@
 
 .search-field__icon {
   position: absolute;
-  inset-inline-start: 0.95rem;
+  inset-inline-start: 0.85rem;
   color: var(--text-muted);
   pointer-events: none;
   transition: color var(--transition);
+  z-index: 2;
 }
 
 .search-field__input {
   width: min(280px, 70vw);
   height: 42px;
   padding-block: 0;
-  padding-inline: 2.65rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--grad-surface);
+  padding-inline: 2.45rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
   color: var(--text-h);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.4;
   transition:
     border-color var(--transition),
@@ -104,14 +105,14 @@
 }
 
 .search-field__input:hover {
-  border-color: rgba(196, 163, 90, 0.55);
+  border-color: rgba(196, 163, 90, 0.65);
 }
 
 .search-field__input:focus {
   outline: none;
   border-color: var(--brand-gold);
   box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.18);
-  background: #fff;
+  background: #ffffff;
 }
 
 .search-field:focus-within .search-field__icon {
@@ -300,12 +301,13 @@
 
 .input {
   width: 100%;
-  padding: 0.7rem 0.85rem;
-  border: 1px solid #dde3e3;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: #ffffff;
   color: var(--text-h);
   font: inherit;
+  font-size: 0.88rem;
   transition:
     border-color var(--transition),
     box-shadow var(--transition),
@@ -313,13 +315,14 @@
 }
 
 .input:hover {
-  border-color: rgba(196, 163, 90, 0.55);
+  border-color: rgba(196, 163, 90, 0.65);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--brand-gold);
-  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.16);
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.18);
+  background: #ffffff;
 }
 
 .input--area {
@@ -566,6 +569,13 @@
 .doc-item__body {
   flex: 1;
   min-width: 0;
+}
+
+.doc-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .timeline-item__icon,

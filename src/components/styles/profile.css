@@ -380,7 +380,7 @@
 /* ── Main Two-Column Layout ── */
 .profile-content-grid {
   display: grid;
-  grid-template-columns: 1fr 370px;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
   align-items: start;
 }
@@ -805,6 +805,22 @@
   .profile-accreditation-row {
     grid-template-columns: 1fr;
   }
+}
+
+.notifications-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.notifications-page .cases-toolbar {
+  margin-bottom: 1.25rem;
+}
+
+.notifications-page .cases-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
 }
 
 .notifications-page .cases-toolbar__title {

@@ -73,15 +73,19 @@ apiClient.interceptors.request.use((config) => {
 
 /**
  * Response interceptor: handle common HTTP errors.
+ * 401 = unauthenticated → clear session, redirect to login.
+ * 403 = unauthorized (role/permission) → redirect to dashboard, keep session.
  */
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status
-    if (status === 401 || status === 403) {
-      // Clear session on auth error
+    if (status === 401) {
       localStorage.removeItem(AUTH_KEY)
       window.location.href = `${import.meta.env.BASE_URL}login`
+    } else if (status === 403) {
+      // Role-based restriction — don't clear auth, redirect to dashboard
+      window.location.href = import.meta.env.BASE_URL || '/'
     }
     return Promise.reject(error)
   },

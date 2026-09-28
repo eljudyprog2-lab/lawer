@@ -1,5 +1,81 @@
 /* Shared form / filter spacing — preserve existing look, fix consistency */
 
+/* ── Authoritative Unified Input Theme Across Entire App ── */
+.input,
+.form-input,
+.search-field__input,
+input[type='text']:not(.topbar__search-input),
+input[type='search']:not(.topbar__search-input),
+input[type='email'],
+input[type='password'],
+input[type='tel'],
+input[type='number'],
+input[type='date'],
+input[type='url'],
+select.input,
+textarea.input,
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1.5px solid var(--border, #d5e0e0);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--text-h, #1e3a3c);
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  transition:
+    border-color var(--transition, 0.2s ease),
+    box-shadow var(--transition, 0.2s ease),
+    background var(--transition, 0.2s ease);
+}
+
+.input:hover,
+.form-input:hover,
+.search-field__input:hover,
+input[type='text']:not(.topbar__search-input):hover,
+input[type='search']:not(.topbar__search-input):hover,
+input[type='email']:hover,
+input[type='password']:hover,
+input[type='tel']:hover,
+input[type='number']:hover,
+input[type='date']:hover,
+input[type='url']:hover,
+select.input:hover,
+textarea.input:hover,
+textarea:hover {
+  border-color: rgba(196, 163, 90, 0.65);
+}
+
+.input:focus,
+.form-input:focus,
+.search-field__input:focus,
+input[type='text']:not(.topbar__search-input):focus,
+input[type='search']:not(.topbar__search-input):focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='tel']:focus,
+input[type='number']:focus,
+input[type='date']:focus,
+input[type='url']:focus,
+select.input:focus,
+textarea.input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--brand-gold, #c4a35a);
+  box-shadow: 0 0 0 3px rgba(196, 163, 90, 0.18);
+  background: #ffffff;
+}
+
+.input::placeholder,
+.form-input::placeholder,
+.search-field__input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted, #6b7f80);
+  opacity: 0.85;
+}
+
 .field {
   display: flex;
   flex-direction: column;

@@ -5,6 +5,7 @@ import { OptionModal } from '../lists/OptionModal'
 import { DeleteOptionModal } from '../lists/DeleteOptionModal'
 import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { useLookupGroup } from '../../hooks/useLookups'
+import { useToast } from '../../context/ToastContext'
 import { parseApiError } from '../../api/client'
 import { apiRules } from '../../validation/apiRules'
 import { validateLookupName } from '../../validation/validators'
@@ -29,18 +30,13 @@ export default function ListDetailPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingOption, setEditingOption] = useState(null)
   const [deletingOption, setDeletingOption] = useState(null)
-  const [toast, setToast] = useState(null)
+  const { showToast } = useToast()
 
   // Quick Add sidebar form state
   const [quickName, setQuickName] = useState('')
   const [quickDesc, setQuickDesc] = useState('')
   const [quickError, setQuickError] = useState(null)
   const [quickTouched, setQuickTouched] = useState(false)
-
-  const showToast = (text, tone = 'success') => {
-    setToast({ text, tone })
-    setTimeout(() => setToast(null), 3500)
-  }
 
   // Filter options by search
   const filteredOptions = useMemo(() => {
@@ -193,28 +189,6 @@ export default function ListDetailPage() {
         </div>
       </div>
 
-      {/* ── Toast Alert ── */}
-      {toast ? (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.65rem',
-            padding: '0.75rem 1.15rem',
-            borderRadius: '12px',
-            background: toast.tone === 'error' ? '#fef2f2' : '#ecfdf5',
-            color: toast.tone === 'error' ? '#991b1b' : '#065f46',
-            border: `1px solid ${toast.tone === 'error' ? '#fecaca' : '#a7f3d0'}`,
-            fontSize: '0.88rem',
-            fontWeight: 700,
-          }}
-        >
-          <Icon name={toast.tone === 'error' ? 'alert' : 'check'} size={18} />
-          <span>{toast.text}</span>
-        </div>
-      ) : null}
 
       {/* ── Error Banner ── */}
       {error ? (
@@ -379,9 +353,6 @@ export default function ListDetailPage() {
                 />
               </div>
 
-              {/* صندوق ملخص أخطاء التحقق */}
-              <ValidationSummaryBox errors={quickError} />
-
               <button
                 type="submit"
                 className="btn btn--primary"
@@ -428,32 +399,16 @@ export default function ListDetailPage() {
               <span className="mgmt-counter-pill">{filteredOptions.length}</span>
             </div>
 
-            <div style={{ position: 'relative', width: '260px' }}>
-              <span
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#94a3b8',
-                }}
-              >
-                <Icon name="search" size={16} />
-              </span>
+            <div className="search-field" style={{ width: '260px' }}>
+              <Icon name="search" className="search-field__icon" />
               <input
                 type="search"
+                className="search-field__input"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="بحث في الخيارات..."
-                style={{
-                  width: '100%',
-                  height: '38px',
-                  padding: '0 2.25rem 0 0.85rem',
-                  border: '1.5px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: '0.84rem',
-                  outline: 'none',
-                }}
+                aria-label="بحث في الخيارات"
+                style={{ width: '100%' }}
               />
             </div>
           </div>

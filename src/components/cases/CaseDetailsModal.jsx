@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Icon } from '../ui/Icon'
+import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { AddEventModal } from './AddEventModal'
 import { UploadDocumentModal } from './UploadDocumentModal'
 import {
   buildDocumentFormData,
   createCaseDocument,
+  deleteCaseDocument,
+  deleteDocument,
   downloadDocumentFile,
   fetchCaseDocuments,
   normalizeDocument,
@@ -13,6 +16,7 @@ import {
 } from '../../api/documents'
 import { getStoredCompanyId } from '../../api/client'
 import { formatDisplayDate } from '../../utils/formatDisplay'
+import { useToast } from '../../context/ToastContext'
 
 const tabs = [
   { id: 'overview', label: 'نظرة عامة', icon: 'info' },
@@ -79,6 +83,7 @@ function mapDocForList(doc) {
 }
 
 export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly = false }) {
+  const { showToast } = useToast()
   const [tab, setTab] = useState('overview')
   const [eventOpen, setEventOpen] = useState(false)
   const [docOpen, setDocOpen] = useState(false)
@@ -86,6 +91,8 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
   const [documents, setDocuments] = useState([])
   const [docsLoading, setDocsLoading] = useState(false)
   const [docError, setDocError] = useState(null)
+  const [deletingDoc, setDeletingDoc] = useState(null)
+  const [isDeletingDoc, setIsDeletingDoc] = useState(false)
 
   const loadDocuments = useCallback(async () => {
     if (!caseData?.id) return
@@ -122,6 +129,7 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
   const handleAddEvent = (event) => {
     if (readOnly || !onUpdate) return
     setEvents((prev) => [event, ...prev])
+    showToast('تمت إضافة الإجراء القانوني بنجاح')
     onUpdate()
   }
 
@@ -160,19 +168,46 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
         )
         await createCaseDocument(fd)
       }
+      showToast('تم رفع المستند إلى ملف القضية بنجاح')
       await loadDocuments()
       onUpdate()
     } catch (err) {
-      setDocError(parseDocError(err).message)
+      const errMsg = parseDocError(err).message
+      setDocError(errMsg)
+      showToast(errMsg, 'error')
       throw err
     }
   }
 
   const handleDownloadDoc = async (doc) => {
     try {
+      showToast('جاري تحميل المستند...')
       await downloadDocumentFile(doc)
     } catch (err) {
-      setDocError(err?.message || parseDocError(err).message || 'تعذر تحميل الملف')
+      const errMsg = err?.message || parseDocError(err).message || 'تعذر تحميل الملف'
+      setDocError(errMsg)
+      showToast(errMsg, 'error')
+    }
+  }
+
+  const handleConfirmDeleteDoc = async () => {
+    if (!deletingDoc) return
+    setIsDeletingDoc(true)
+    try {
+      try {
+        await deleteCaseDocument(deletingDoc.id)
+      } catch {
+        await deleteDocument(deletingDoc.id)
+      }
+      showToast('تم حذف المستند بنجاح')
+      setDeletingDoc(null)
+      await loadDocuments()
+      if (onUpdate) onUpdate()
+    } catch (err) {
+      const errMsg = parseDocError(err).message || 'فشل حذف المستند'
+      showToast(errMsg, 'error')
+    } finally {
+      setIsDeletingDoc(false)
     }
   }
 
@@ -422,15 +457,28 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
                         </div>
                         {doc.notes ? <p>{doc.notes}</p> : null}
                       </div>
-                      <button
-                        type="button"
-                        className="action-btn action-btn--download"
-                        title="تحميل"
-                        aria-label={`تحميل ${doc.fileName || doc.name}`}
-                        onClick={() => handleDownloadDoc(doc)}
-                      >
-                        <Icon name="download" size={16} />
-                      </button>
+                      <div className="doc-item__actions">
+                        <button
+                          type="button"
+                          className="action-btn action-btn--download"
+                          title="تحميل"
+                          aria-label={`تحميل ${doc.fileName || doc.name}`}
+                          onClick={() => handleDownloadDoc(doc)}
+                        >
+                          <Icon name="download" size={16} />
+                        </button>
+                        {!readOnly ? (
+                          <button
+                            type="button"
+                            className="action-btn action-btn--delete"
+                            title="مسح المستند"
+                            aria-label={`مسح ${doc.fileName || doc.name}`}
+                            onClick={() => setDeletingDoc(doc)}
+                          >
+                            <Icon name="trash" size={16} />
+                          </button>
+                        ) : null}
+                      </div>
                     </article>
                   ))}
                 </div>
@@ -450,6 +498,16 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
         onClose={() => setDocOpen(false)}
         onSave={handleAddDocument}
         caseLabel={`${caseData.number ?? caseData.case_number} — ${caseData.title}`}
+      />
+
+      <ConfirmDeleteModal
+        open={Boolean(deletingDoc)}
+        onClose={() => !isDeletingDoc && setDeletingDoc(null)}
+        onConfirm={handleConfirmDeleteDoc}
+        loading={isDeletingDoc}
+        title="تأكيد مسح المستند"
+        message="هل أنت متأكد من مسح هذا المستند نهائياً من ملف القضية؟ لن يمكن استرجاعه بعد الحذف."
+        itemName={deletingDoc?.name || deletingDoc?.fileName || ''}
       />
     </>
   )

@@ -9,6 +9,7 @@ import { useNotifications } from '../../hooks/useNotifications'
 
 const titles = {
   ...Object.fromEntries(navItems.map((item) => [item.path, item.label])),
+  '/permissions': 'الصلاحيات',
   '/profile': 'الملف الشخصي',
   '/notifications': 'الإشعارات',
   '/manage-lists': 'إدارة القوائم والخيارات',
@@ -43,11 +44,6 @@ export function DashboardLayout() {
         <main className="content page-enter">
           <Outlet />
         </main>
-      </div>
-
-      <div className="db-status" role="status">
-        <span className="db-status__dot" />
-        متصل بقاعدة البيانات
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
@@ -8,6 +8,7 @@ import { UploadDocumentModal } from '../documents/UploadDocumentModal'
 import { DocumentDetailsModal } from '../documents/DocumentDetailsModal'
 import { DocumentNotesModal } from '../documents/DocumentNotesModal'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { useDocuments, useDocumentMutations } from '../../hooks/useDocuments'
 import { useCases } from '../../hooks/useCases'
 import { getStoredCompanyId } from '../../api/client'
@@ -57,15 +58,7 @@ export default function DocumentsPage() {
   const [detailsId, setDetailsId] = useState(null)
   const [notesId, setNotesId] = useState(null)
   const [deletingDoc, setDeletingDoc] = useState(null)
-  const [toast, setToast] = useState(null)
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const id = window.setTimeout(() => setToast(null), 3200)
-    return () => window.clearTimeout(id)
-  }, [toast])
-
-  const showToast = (text, tone = 'success') => setToast({ text, tone })
+  const { showToast } = useToast()
 
   const caseOptions = useMemo(
     () =>
@@ -209,15 +202,6 @@ export default function DocumentsPage() {
 
   return (
     <div className="documents-page">
-      {toast ? (
-        <div
-          className={`toast toast--${toast.tone === 'error' ? 'error' : 'success'}`}
-          role="status"
-        >
-          {toast.text}
-        </div>
-      ) : null}
-
       <div className="stats-grid">
         <StatCard
           value={stats.total}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
@@ -8,6 +8,7 @@ import { InvoiceFormModal } from '../invoices/InvoiceFormModal'
 import { InvoiceDetailsModal } from '../invoices/InvoiceDetailsModal'
 import { RecordPaymentModal } from '../invoices/RecordPaymentModal'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import {
   useInvoices,
   useInvoiceMutations,
@@ -87,15 +88,7 @@ export default function InvoicesPage() {
   const [detailsId, setDetailsId] = useState(null)
   const [paymentId, setPaymentId] = useState(null)
   const [deletingInvoice, setDeletingInvoice] = useState(null)
-  const [toast, setToast] = useState(null)
-
-  useEffect(() => {
-    if (!toast) return undefined
-    const id = window.setTimeout(() => setToast(null), 3200)
-    return () => window.clearTimeout(id)
-  }, [toast])
-
-  const showToast = (text, tone = 'success') => setToast({ text, tone })
+  const { showToast } = useToast()
 
   const stats = useMemo(() => {
     const fromDash = mapInvoiceDashboardStats(dashRaw)
@@ -186,15 +179,6 @@ export default function InvoicesPage() {
 
   return (
     <div className="invoices-page">
-      {toast ? (
-        <div
-          className={`toast toast--${toast.tone === 'error' ? 'error' : 'success'}`}
-          role="status"
-        >
-          {toast.text}
-        </div>
-      ) : null}
-
       <div className="stats-grid">
         <StatCard value={formatMoney(stats.total)} label="إجمالي الفواتير" tone="gold" icon="invoices" index={0} />
         <StatCard value={formatMoney(stats.collected)} label="المحصّل" tone="success" icon="check" index={1} />
