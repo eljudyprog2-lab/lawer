@@ -140,7 +140,7 @@ export default function DashboardPage() {
     [sessions],
   )
   const totalRemainingBalance = useMemo(() => {
-    if (!invoices || invoices.length === 0) return 5000
+    if (!invoices || invoices.length === 0) return 0
     const sum = invoices.reduce((acc, inv) => {
       const rem =
         inv.remaining !== undefined
@@ -149,7 +149,7 @@ export default function DashboardPage() {
             Number(inv.paid_amount || inv.paid || 0)
       return acc + (isNaN(rem) ? 0 : rem)
     }, 0)
-    return sum > 0 ? sum : 5000
+    return sum >= 0 ? sum : 0
   }, [invoices])
 
   const isLoading = dashLoading || clientsLoading || casesLoading || appointmentsLoading
@@ -170,14 +170,14 @@ export default function DashboardPage() {
       {
         id: 'cases',
         label: 'قضايا',
-        value: String(activeCasesCount || (cases.length > 0 ? cases.length : 1)),
+        value: String(activeCasesCount),
         tone: 'gold',
         icon: 'cases',
       },
       {
         id: 'appointments',
         label: 'مواعيدي',
-        value: String(appointments.length || 2),
+        value: String(appointments.length),
         tone: 'teal',
         icon: 'calendar',
       },
@@ -198,7 +198,7 @@ export default function DashboardPage() {
       {
         id: 'total',
         label: 'إجمالي القضايا',
-        value: String(cases.length || 1),
+        value: String(cases.length),
         tone: 'gold',
         icon: 'folder',
       },

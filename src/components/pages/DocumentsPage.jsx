@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
+import { Pagination } from '../ui/Pagination'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { StatCard } from '../dashboard/StatCard'
 import { UploadDocumentModal } from '../documents/UploadDocumentModal'
@@ -11,6 +12,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { useDocuments, useDocumentMutations } from '../../hooks/useDocuments'
 import { useCases } from '../../hooks/useCases'
+import { usePagination } from '../../hooks/usePagination'
 import { getStoredCompanyId } from '../../api/client'
 import {
   buildDocumentFormData,
@@ -99,6 +101,8 @@ export default function DocumentsPage() {
         .includes(q)
     })
   }, [documents, query, typeFilter, caseFilter])
+
+  const { page, setPage, paginated } = usePagination(filtered)
 
   const detailsDoc = documents.find((item) => item.id === detailsId) || null
   const notesDoc = documents.find((item) => item.id === notesId) || null
@@ -353,7 +357,7 @@ export default function DocumentsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((doc) => (
+                  paginated.map((doc) => (
                     <tr key={doc.id}>
                       <td>
                         <div className="doc-file-cell">
@@ -419,6 +423,11 @@ export default function DocumentsPage() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            page={page}
+            total={filtered.length}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       ) : null}
 

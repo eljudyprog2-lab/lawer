@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
 import { OptionModal } from '../lists/OptionModal'
 import { DeleteOptionModal } from '../lists/DeleteOptionModal'
+import { Pagination } from '../ui/Pagination'
+import { usePagination } from '../../hooks/usePagination'
 import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { useLookupGroup } from '../../hooks/useLookups'
 import { useToast } from '../../context/ToastContext'
@@ -46,6 +48,8 @@ export default function ListDetailPage() {
       `${opt.name || ''} ${opt.code || ''} ${opt.description || ''}`.toLowerCase().includes(q),
     )
   }, [options, search])
+
+  const { page, setPage, paginated, resetPage } = usePagination(filteredOptions)
 
   // Handle Quick Add Submit
   const handleQuickAdd = async (e) => {
@@ -127,33 +131,25 @@ export default function ListDetailPage() {
 
   return (
     <div className="mgmt-page">
-      {/* ── Breadcrumb & Navigation Bar ── */}
+      {/* ── Topbar ── */}
       <div className="mgmt-topbar">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#64748b', marginBottom: '0.25rem' }}>
-            <Link to="/manage-lists" style={{ color: '#2563eb', textDecoration: 'none' }}>
-              إدارة القوائم المعرفة
-            </Link>
-            <span>&gt;</span>
-            <span>{group.name}</span>
-          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <h1 className="mgmt-topbar__title">
-              إدارة خيارات: {group.name} ({group.englishName})
+            <h1 className="mgmt-topbar__title" style={{ background: 'var(--grad-title)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent' }}>
+              إدارة خيارات: {group.name}
             </h1>
             <span className="mgmt-code-badge">{group.code}</span>
             {isApiManaged ? (
-              <span className="mgmt-badge" style={{ background: '#ecfdf5', color: '#047857' }}>
+              <span className="mgmt-badge" style={{ background: 'var(--success-bg)', color: 'var(--success)' }}>
                 <Icon name="check" size={12} />
-                قائمة تفاعلية (CRUD)
+                قائمة تفاعلية
               </span>
             ) : (
-              <span className="mgmt-badge" style={{ background: '#f1f5f9', color: '#475569' }}>
-                ثوابت نظامية (Enums)
+              <span className="mgmt-badge" style={{ background: 'var(--surface-alt)', color: 'var(--text-muted)' }}>
+                ثوابت نظامية
               </span>
             )}
           </div>
-          <p className="mgmt-topbar__subtitle">{group.usageContext}</p>
         </div>
 
         <div className="mgmt-topbar__actions">
@@ -199,10 +195,10 @@ export default function ListDetailPage() {
             alignItems: 'center',
             gap: '0.65rem',
             padding: '0.85rem 1.15rem',
-            borderRadius: '12px',
-            background: '#fef2f2',
-            color: '#991b1b',
-            border: '1px solid #fecaca',
+            borderRadius: 'var(--radius)',
+            background: 'var(--danger-bg)',
+            color: 'var(--danger)',
+            border: '1px solid var(--danger)',
             fontSize: '0.88rem',
             fontWeight: 700,
           }}
@@ -216,9 +212,9 @@ export default function ListDetailPage() {
       {!isApiManaged && (
         <div
           style={{
-            background: '#f8fafc',
-            border: '1.5px solid #e2e8f0',
-            borderRadius: '14px',
+            background: 'var(--surface-alt)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
             padding: '1rem 1.25rem',
             display: 'flex',
             alignItems: 'flex-start',
@@ -229,9 +225,9 @@ export default function ListDetailPage() {
             style={{
               width: '36px',
               height: '36px',
-              borderRadius: '10px',
-              background: '#e2e8f0',
-              color: '#334155',
+              borderRadius: '8px',
+              background: 'var(--brand-teal)',
+              color: 'var(--brand-gold)',
               display: 'grid',
               placeItems: 'center',
               flexShrink: 0,
@@ -240,11 +236,11 @@ export default function ListDetailPage() {
             <Icon name="info" size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#1e293b' }}>
-              قائمة نظامية ثابتة (System Enumeration)
+            <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-h)' }}>
+              قائمة نظامية ثابتة
             </div>
-            <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: '#64748b', lineHeight: 1.5 }}>
-              خيارات هذه المجموعة محددة بنيوياً في كود وقاعدة بيانات الخادم (Backend Enums) لحفظ اتساق منطق المحاكم. لا توجد نقاط نهاية (Endpoints) لإضافة أو حذف خيارات من الواجهة البرمجية لهذه المجموعة؛ التعديلات تتطلب تحديث مسار النظام البرمجي.
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              خيارات هذه المجموعة محددة بنيوياً في كود وقاعدة بيانات الخادم لحفظ اتساق منطق المحاكم.
             </p>
           </div>
         </div>
@@ -258,18 +254,18 @@ export default function ListDetailPage() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '0.75rem',
-          background: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '12px',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
           padding: '0.75rem 1rem',
           fontSize: '0.82rem',
-          color: '#475569',
+          color: 'var(--text)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Icon name="info" size={16} style={{ color: '#2563eb' }} />
+          <Icon name="info" size={16} style={{ color: 'var(--brand-teal)' }} />
           <span>
-            <strong>ترتيب الخيارات:</strong> يتم فرز الخيارات وفق معرّف التسجيل الزمني (ID) المدعوم من خادم الـ API.
+            <strong>ترتيب الخيارات:</strong> يتم فرز الخيارات وفق معرّف التسجيل الزمني (ID) من خادم الـ API.
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -294,13 +290,13 @@ export default function ListDetailPage() {
                 <span className="mgmt-dot--amber" />
                 <h3 className="mgmt-card__title" style={{ fontSize: '0.95rem' }}>إضافة خيار سريع</h3>
               </div>
-              <span style={{ fontSize: '0.74rem', color: '#64748b' }}>مباشر للـ API</span>
+              <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>حفظ فوري بالنظام</span>
             </div>
 
             <form onSubmit={handleQuickAdd} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="mgmt-input-wrap">
                 <label htmlFor="quick-opt-name" style={{ fontSize: '0.8rem' }}>
-                  اسم الخيار <strong style={{ color: '#dc2626' }}>*</strong>
+                  اسم الخيار <strong style={{ color: 'var(--danger)' }}>*</strong>
                 </label>
                 <input
                   id="quick-opt-name"
@@ -319,12 +315,12 @@ export default function ListDetailPage() {
                   maxLength={apiRules.lookups.name.max}
                   style={{
                     height: '40px',
-                    borderColor: quickError ? '#dc2626' : undefined,
-                    background: quickError ? '#fef2f2' : undefined,
+                    borderColor: quickError ? 'var(--danger)' : undefined,
+                    background: quickError ? 'var(--danger-bg)' : undefined,
                   }}
                 />
                 {quickError && (
-                  <span style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--danger)', fontWeight: 600 }}>
                     {quickError}
                   </span>
                 )}
@@ -344,11 +340,13 @@ export default function ListDetailPage() {
                   style={{
                     width: '100%',
                     padding: '0.5rem 0.75rem',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '10px',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
                     fontSize: '0.84rem',
                     outline: 'none',
                     resize: 'none',
+                    background: 'var(--surface)',
+                    color: 'var(--text-h)',
                   }}
                 />
               </div>
@@ -377,13 +375,13 @@ export default function ListDetailPage() {
               style={{
                 marginTop: '1.25rem',
                 paddingTop: '0.85rem',
-                borderTop: '1px solid #f1f5f9',
+                borderTop: '1px solid var(--border-light)',
                 fontSize: '0.76rem',
-                color: '#64748b',
+                color: 'var(--text-muted)',
                 lineHeight: 1.5,
               }}
             >
-              <div style={{ fontWeight: 700, color: '#475569', marginBottom: '0.2rem' }}>ملاحظة تنظيمية:</div>
+              <div style={{ fontWeight: 700, color: 'var(--text)', marginBottom: '0.2rem' }}>ملاحظة تنظيمية:</div>
               الخيارات المضافة حديثاً تصبح متاحة فوراً لكافة منسوبي المكتب في نماذج تسجيل القضايا الجديدة.
             </div>
           </div>
@@ -393,7 +391,7 @@ export default function ListDetailPage() {
         <div className="mgmt-table-card">
           <div className="mgmt-tabs-row">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0f172a' }}>
+              <span style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-h)' }}>
                 خيارات القائمة المسجلة
               </span>
               <span className="mgmt-counter-pill">{filteredOptions.length}</span>
@@ -428,7 +426,7 @@ export default function ListDetailPage() {
                 {isLoading ? (
                   <tr>
                     <td colSpan={isApiManaged ? 5 : 4} style={{ textAlign: 'center', padding: '3rem' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: '#64748b' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
                         <Icon name="refresh" size={24} className="animate-spin" />
                         <span>جاري تحميل خيارات القائمة...</span>
                       </div>
@@ -437,21 +435,21 @@ export default function ListDetailPage() {
                 ) : filteredOptions.length === 0 ? (
                   <tr>
                     <td colSpan={isApiManaged ? 5 : 4} style={{ textAlign: 'center', padding: '3rem' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.65rem', color: '#64748b' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.65rem', color: 'var(--text-muted)' }}>
                         <div
                           style={{
                             width: '48px',
                             height: '48px',
                             borderRadius: '50%',
-                            background: '#f8fafc',
+                            background: 'var(--surface-alt)',
                             display: 'grid',
                             placeItems: 'center',
-                            color: '#94a3b8',
+                            color: 'var(--text-muted)',
                           }}
                         >
                           <Icon name="alert" size={24} />
                         </div>
-                        <span style={{ fontWeight: 800, color: '#0f172a' }}>
+                        <span style={{ fontWeight: 800, color: 'var(--text-h)' }}>
                           لا توجد خيارات مضافة بعد في هذه المجموعة
                         </span>
                         <p style={{ margin: 0, fontSize: '0.82rem' }}>
@@ -460,7 +458,7 @@ export default function ListDetailPage() {
                         {isApiManaged && (
                           <button
                             type="button"
-                            className="mgmt-btn mgmt-btn--dark"
+                            className="btn btn--primary"
                             onClick={() => {
                               setEditingOption(null)
                               setModalOpen(true)
@@ -475,23 +473,23 @@ export default function ListDetailPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredOptions.map((opt, idx) => {
+                  paginated.map((opt, idx) => {
                     const refInfo = checkReferences(opt.id)
                     return (
                       <tr key={opt.id || opt.code || idx}>
                         {/* Index / ID */}
-                        <td style={{ textAlign: 'center', fontFamily: 'monospace', color: '#64748b', fontWeight: 700 }}>
+                        <td style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--text-muted)', fontWeight: 700 }}>
                           #{opt.id || idx + 1}
                         </td>
 
                         {/* Name & description */}
                         <td>
                           <div>
-                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0f172a' }}>
+                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-h)' }}>
                               {opt.name}
                             </span>
                             {opt.description && (
-                              <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '0.15rem' }}>
+                              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
                                 {opt.description}
                               </div>
                             )}
@@ -503,13 +501,13 @@ export default function ListDetailPage() {
                           {refInfo.isReferenced ? (
                             <span
                               className="mgmt-pill-badge"
-                              style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}
+                              style={{ background: 'var(--brand-gold-glow)', color: 'var(--brand-gold-dark)', border: '1px solid var(--brand-gold)' }}
                             >
                               <Icon name="cases" size={13} />
                               مستخدم في {refInfo.count} قضية
                             </span>
                           ) : (
-                            <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                               {opt.created_at ? new Date(opt.created_at).toLocaleDateString('ar-SA') : 'ثابت بالنظام'}
                             </span>
                           )}
@@ -555,6 +553,13 @@ export default function ListDetailPage() {
               </tbody>
             </table>
           </div>
+
+          <Pagination
+            page={page}
+            total={filteredOptions.length}
+            perPage={10}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       </div>
 

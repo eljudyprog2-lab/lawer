@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
+import { Pagination } from '../ui/Pagination'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { StatCard } from '../dashboard/StatCard'
 import { InvoiceFormModal } from '../invoices/InvoiceFormModal'
@@ -14,6 +15,7 @@ import {
   useInvoiceMutations,
   useInvoiceDashboard,
 } from '../../hooks/useInvoices'
+import { usePagination } from '../../hooks/usePagination'
 import { getStoredCompanyId } from '../../api/client'
 import {
   invoiceStatusOptions,
@@ -40,11 +42,11 @@ function printInvoice(invoice, payment) {
   const rows = payment
     ? `<tr><td>${formatInvoiceDate(payment.date)}</td><td>${formatMoney(payment.amount)}</td><td>${payment.method}</td><td>${payment.reference || '—'}</td></tr>`
     : (invoice.payments || [])
-        .map(
-          (p) =>
-            `<tr><td>${formatInvoiceDate(p.date)}</td><td>${formatMoney(p.amount)}</td><td>${p.method}</td><td>${p.reference || '—'}</td></tr>`,
-        )
-        .join('')
+      .map(
+        (p) =>
+          `<tr><td>${formatInvoiceDate(p.date)}</td><td>${formatMoney(p.amount)}</td><td>${p.method}</td><td>${p.reference || '—'}</td></tr>`,
+      )
+      .join('')
   win.document.write(`
     <html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>${payment ? 'إيصال' : 'فاتورة'} ${invoice.number}</title>
     <style>
@@ -114,6 +116,8 @@ export default function InvoicesPage() {
         .includes(q)
     })
   }, [invoices, query, statusFilter])
+
+  const { page, setPage, paginated } = usePagination(filtered)
 
   const editingInvoice = invoices.find((item) => item.id === editingId) || null
   const detailsInvoice = invoices.find((item) => item.id === detailsId) || null
@@ -293,7 +297,7 @@ export default function InvoicesPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((inv) => {
+                  paginated.map((inv) => {
                     const due = remaining(inv)
                     const isPayable = due > 0 && inv.status !== 'ملغاة'
                     return (
@@ -373,6 +377,11 @@ export default function InvoicesPage() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            page={page}
+            total={filtered.length}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       ) : null}
 

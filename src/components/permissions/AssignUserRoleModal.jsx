@@ -1,39 +1,74 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Modal } from '../ui/Modal'
 import { Field, FieldGrid, FormBanner, FormSection } from '../ui/Form'
 import { FilterSelect } from '../ui/FilterSelect'
 import { Icon } from '../ui/Icon'
 import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
-import { userRoleOptions } from '../../api/users'
+
+const APPLICATION_SCOPE_OPTIONS = [
+  { value: 'وصول مخصص ومقيد', label: 'وصول مخصص ومقيد' },
+  { value: 'وصول متقدم', label: 'وصول متقدم' },
+  { value: 'وصول شامل وكامل', label: 'وصول شامل وكامل' },
+  { value: 'وصول مالي وإداري', label: 'وصول مالي وإداري' },
+]
 
 export function AssignUserRoleModal({
   open,
+  mode = 'create',
+  initialValues = null,
   users = [],
+  jobRoles = [],
   onClose,
   onAssign,
   submitting = false,
 }) {
+  const isEdit = mode === 'edit'
   const [selectedUserId, setSelectedUserId] = useState('')
-  const [selectedRole, setSelectedRole] = useState('lawyer')
-  const [error, setError] = useState('')
+  const [selectedJobRoleId, setSelectedJobRoleId] = useState('')
+  const [applicationScope, setApplicationScope] = useState('وصول مخصص ومقيد')
+  const [errors, setErrors] = useState({})
 
-  const selectedUser = users.find((u) => String(u.id) === String(selectedUserId)) || null
+  useEffect(() => {
+    if (!open) return
+    setErrors({})
+    if (isEdit && initialValues) {
+      setSelectedUserId(String(initialValues.user_id || initialValues.user?.id || ''))
+      setSelectedJobRoleId(String(initialValues.job_role_id || initialValues.job_role?.id || ''))
+      setApplicationScope(initialValues.application_scope || 'وصول مخصص ومقيد')
+    } else {
+      setSelectedUserId('')
+      setSelectedJobRoleId(jobRoles.length > 0 ? String(jobRoles[0].id) : '')
+      setApplicationScope('وصول مخصص ومقيد')
+    }
+  }, [open, isEdit, initialValues, jobRoles])
+
+  const selectedUser = users.find((u) => String(u.id) === String(selectedUserId)) || initialValues?.user || null
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!selectedUserId) {
-      setError('يرجى اختيار المستخدم أولاً')
+    const errs = {}
+    if (!isEdit && !selectedUserId) {
+      errs.user_id = 'يرجى اختيار المستخدم من النظام'
+    }
+    if (!selectedJobRoleId) {
+      errs.job_role_id = 'يرجى تحديد الدور الوظيفي'
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
       return
     }
 
     try {
       await onAssign({
-        userId: selectedUserId,
-        role: selectedRole,
+        id: initialValues?.id,
+        user_id: Number(selectedUserId),
+        job_role_id: Number(selectedJobRoleId),
+        application_scope: applicationScope,
       })
       onClose()
     } catch (err) {
-      setError(err?.message || 'تعذر تعيين الصلاحية للمستخدم')
+      setErrors({ form: err?.message || 'تعذر حفظ تعيين الدور للمستخدم' })
     }
   }
 
@@ -41,33 +76,42 @@ export function AssignUserRoleModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="تعيين صلاحية ودور وظيفي لمستخدم"
+      title={isEdit ? 'تعديل تعيين الدور الوظيفي للمستخدم' : 'تعيين دور وظيفي جديد لمستخدم'}
       wide
     >
       <form onSubmit={handleSubmit} noValidate>
-        {error && <FormBanner>{error}</FormBanner>}
+        {errors.form && <FormBanner>{errors.form}</FormBanner>}
 
         <FormSection
           icon={<Icon name="key" size={18} />}
-          title="تحديد المستخدم والدور الجديد"
+          title="معلومات المستخدم والدور الوظيفي"
         >
-          <Field label="اختر المستخدم من النظام" required>
-            <FilterSelect
-              value={selectedUserId}
-              onChange={(value) => {
-                setSelectedUserId(value)
-                setError('')
-              }}
-              aria-label="اختر المستخدم من النظام"
-              options={[
-                { value: '', label: '-- اختر المستخدم من القائمة --' },
-                ...users.map((u) => ({
-                  value: u.id,
-                  label: `${u.name || u.full_name} (${u.email}) — الحالي: ${u.roleLabel || u.role}`,
-                })),
-              ]}
-            />
-          </Field>
+          {!isEdit ? (
+            <Field label="اختر المستخدم من النظام" required error={errors.user_id}>
+              <FilterSelect
+                value={selectedUserId}
+                onChange={(value) => {
+                  setSelectedUserId(value)
+                  setErrors((prev) => ({ ...prev, user_id: '' }))
+                }}
+                aria-label="اختر المستخدم من النظام"
+                options={[
+                  { value: '', label: '-- اختر المستخدم من القائمة --' },
+                  ...users.map((u) => ({
+                    value: String(u.id),
+                    label: `${u.name || u.full_name} (${u.email})`,
+                  })),
+                ]}
+              />
+            </Field>
+          ) : (
+            <div style={{ marginBottom: '1rem' }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>المستخدم المحدد:</span>
+              <div style={{ fontWeight: 800, color: 'var(--text-h)', fontSize: '0.95rem', marginTop: '0.2rem' }}>
+                {selectedUser?.name || selectedUser?.full_name} ({selectedUser?.email})
+              </div>
+            </div>
+          )}
 
           {selectedUser && (
             <div
@@ -80,53 +124,56 @@ export function AssignUserRoleModal({
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
                 gap: '0.5rem',
-                marginBottom: '0.5rem',
+                marginBottom: '1rem',
               }}
             >
               <div>
                 <span style={{ color: 'var(--text-muted, #6b7f80)', fontSize: '0.76rem' }}>الاسم:</span>
-                <div style={{ fontWeight: 700 }}>{selectedUser.name}</div>
+                <div style={{ fontWeight: 700 }}>{selectedUser.name || selectedUser.full_name}</div>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted, #6b7f80)', fontSize: '0.76rem' }}>البريد:</span>
                 <div style={{ fontWeight: 700 }}>{selectedUser.email}</div>
               </div>
               <div>
-                <span style={{ color: 'var(--text-muted, #6b7f80)', fontSize: '0.76rem' }}>الدور الحالي:</span>
-                <div style={{ fontWeight: 700, color: 'var(--brand-teal, #1e3a3c)' }}>
-                  {selectedUser.roleLabel || selectedUser.role}
-                </div>
+                <span style={{ color: 'var(--text-muted, #6b7f80)', fontSize: '0.76rem' }}>الهاتف:</span>
+                <div style={{ fontWeight: 700 }}>{selectedUser.phone || '—'}</div>
               </div>
             </div>
           )}
 
           <FieldGrid cols={2}>
-            <Field label="الدور والصلاحية الجديدة" required>
+            <Field label="الدور الوظيفي" required error={errors.job_role_id}>
               <FilterSelect
-                value={selectedRole}
-                onChange={(value) => setSelectedRole(value)}
-                aria-label="الدور والصلاحية الجديدة"
-                options={userRoleOptions.map((opt) => ({
-                  value: opt.value,
-                  label: `${opt.label} (${opt.value})`,
-                }))}
+                value={selectedJobRoleId}
+                onChange={(value) => {
+                  setSelectedJobRoleId(value)
+                  setErrors((prev) => ({ ...prev, job_role_id: '' }))
+                }}
+                aria-label="الدور الوظيفي"
+                options={[
+                  { value: '', label: '-- اختر الدور الوظيفي --' },
+                  ...jobRoles.map((r) => ({
+                    value: String(r.id),
+                    label: r.name,
+                  })),
+                ]}
               />
             </Field>
 
             <Field label="نطاق التطبيق">
-              <input
-                type="text"
-                className="input"
-                value="تطبيق فوري على كافة العمليات"
-                disabled
-                style={{ background: '#f8fafc', color: '#64748b' }}
+              <FilterSelect
+                value={applicationScope}
+                onChange={(value) => setApplicationScope(value)}
+                aria-label="نطاق التطبيق"
+                options={APPLICATION_SCOPE_OPTIONS}
               />
             </Field>
           </FieldGrid>
         </FormSection>
 
         {/* صندوق ملخص أخطاء التحقق */}
-        <ValidationSummaryBox errors={error} />
+        <ValidationSummaryBox errors={errors} />
 
         {/* Modal Actions */}
         <div
@@ -157,12 +204,12 @@ export function AssignUserRoleModal({
             {submitting ? (
               <>
                 <Icon name="refresh" size={16} className="animate-spin" />
-                جاري التعيين...
+                جاري الحفظ...
               </>
             ) : (
               <>
                 <Icon name="check" size={16} />
-                تأكيد تعيين الدور
+                {isEdit ? 'تحديث تعيين الدور' : 'تأكيد تعيين الدور'}
               </>
             )}
           </button>

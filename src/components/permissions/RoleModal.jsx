@@ -17,9 +17,9 @@ export function RoleModal({
 
   const [form, setForm] = useState({
     name: '',
-    subTitle: '',
+    english_title: '',
     description: '',
-    accessLevel: 'وصول مخصص ومقيد',
+    access_level: 'وصول مخصص ومقيد',
     status: 'نشط',
   })
 
@@ -31,17 +31,17 @@ export function RoleModal({
     if (isEdit && initialValues) {
       setForm({
         name: initialValues.name || '',
-        subTitle: initialValues.subTitle || '',
+        english_title: initialValues.english_title || initialValues.subTitle || '',
         description: initialValues.description || '',
-        accessLevel: initialValues.accessLevel || 'وصول مخصص ومقيد',
+        access_level: initialValues.access_level || initialValues.accessLevel || 'وصول مخصص ومقيد',
         status: initialValues.status || 'نشط',
       })
     } else {
       setForm({
         name: '',
-        subTitle: '',
+        english_title: '',
         description: '',
-        accessLevel: 'وصول مخصص ومقيد',
+        access_level: 'وصول مخصص ومقيد',
         status: 'نشط',
       })
     }
@@ -69,9 +69,9 @@ export function RoleModal({
 
     onSave({
       name: form.name.trim(),
-      subTitle: form.subTitle.trim(),
+      english_title: form.english_title.trim(),
       description: form.description.trim(),
-      accessLevel: form.accessLevel,
+      access_level: form.access_level,
       status: form.status,
     })
   }
@@ -102,13 +102,13 @@ export function RoleModal({
               />
             </Field>
 
-            <Field label="المسمى الإنجليزي / التصنيف">
+            <Field label="المسمى بالإنجليزية">
               <input
                 type="text"
                 className="input"
-                value={form.subTitle}
-                onChange={set('subTitle')}
-                placeholder="مثال: Senior Litigator"
+                value={form.english_title}
+                onChange={set('english_title')}
+                placeholder="المسمى بالإنجليزية (اختياري)"
               />
             </Field>
           </FieldGrid>
@@ -127,8 +127,8 @@ export function RoleModal({
           <FieldGrid cols={2}>
             <Field label="مستوى الوصول في النظام">
               <FilterSelect
-                value={form.accessLevel}
-                onChange={(value) => set('accessLevel')({ target: { value } })}
+                value={form.access_level}
+                onChange={(value) => set('access_level')({ target: { value } })}
                 aria-label="مستوى الوصول في النظام"
                 options={[
                   { value: 'وصول شامل وكامل', label: 'وصول شامل وكامل' },

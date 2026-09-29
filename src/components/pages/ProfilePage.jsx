@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   HiOutlineCheck,
   HiOutlineShieldCheck,
@@ -9,16 +9,9 @@ import {
   HiOutlineLocationMarker,
   HiOutlineCalendar,
   HiOutlineExclamation,
-  HiOutlineDesktopComputer,
-  HiOutlineDeviceMobile,
-  HiOutlineX,
-  HiOutlineUser,
   HiOutlineScale,
-  HiOutlineClock,
-  HiOutlineKey,
   HiOutlineCheckCircle,
 } from 'react-icons/hi'
-import { Icon } from '../ui/Icon'
 import { ConfirmModal } from '../ui/ConfirmModal'
 import { EditProfileModal } from '../profile/EditProfileModal'
 import { ChangePasswordModal } from '../profile/ChangePasswordModal'
@@ -46,38 +39,12 @@ export default function ProfilePage() {
   const { clients } = useClients()
   const { update: updateUserMutation } = useUserMutations()
 
-  // Navigation tab state: 'basic' | 'security' | 'permissions' | 'activity'
-  const [activeTab, setActiveTab] = useState('basic')
-
   // Modals state
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false)
-  const [confirmTerminateAllOpen, setConfirmTerminateAllOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [passwordModalOpen, setPasswordModalOpen] = useState(false)
   const [submittingEdit, setSubmittingEdit] = useState(false)
   const { showToast } = useToast()
-
-  // Dynamic Devices State
-  const [devices, setDevices] = useState([
-    {
-      id: 1,
-      name: 'Chrome على Windows 11',
-      isCurrent: true,
-      ip: '178.52.214.90',
-      location: 'الرياض، السعودية',
-      activity: 'يتصفح الملف الشخصي الآن',
-      type: 'desktop',
-    },
-    {
-      id: 2,
-      name: 'تطبيق المحامي على iPhone 15 Pro',
-      isCurrent: false,
-      ip: '178.52.214.90',
-      location: 'الرياض',
-      lastSeen: 'اليوم 11:42 ص',
-      type: 'mobile',
-    },
-  ])
 
   // Profile data
   const profile = useMemo(() => {
@@ -120,12 +87,15 @@ export default function ProfilePage() {
           values: {
             full_name: formData.name,
             phone: formData.phone,
+            email: formData.email,
           },
         })
       }
       updateUserProfile({
         name: formData.name,
+        full_name: formData.name,
         phone: formData.phone,
+        email: formData.email,
         nationalId: formData.nationalId,
         address: formData.address,
       })
@@ -134,7 +104,9 @@ export default function ProfilePage() {
     } catch {
       updateUserProfile({
         name: formData.name,
+        full_name: formData.name,
         phone: formData.phone,
+        email: formData.email,
         nationalId: formData.nationalId,
         address: formData.address,
       })
@@ -145,36 +117,10 @@ export default function ProfilePage() {
     }
   }
 
-  // Terminate device
-  const handleTerminateDevice = (deviceId) => {
-    setDevices((prev) => prev.filter((d) => d.id !== deviceId))
-    showToast('تم إنهاء جلسة الجهاز المحدد بنجاح')
-  }
 
-  // Terminate all other sessions
-  const handleTerminateAll = () => {
-    setDevices((prev) => prev.filter((d) => d.isCurrent))
-    setConfirmTerminateAllOpen(false)
-    showToast('تم تسجيل الخروج من كافة الأجهزة الأخرى')
-  }
 
   return (
     <div className="profile-page">
-      {/* ── مسار التنقل وحالة الاتصال (Top Bar) ── */}
-      <div className="profile-topbar">
-        <div className="profile-breadcrumbs">
-          <Link to="/dashboard">لوحة التحكم الإدارية</Link>
-          <span>/</span>
-          <Link to="/admin/accounts">إدارة الحسابات</Link>
-          <span>/</span>
-          <span className="current">الملف الشخصي للمستشار</span>
-        </div>
-
-        <div className="profile-db-status">
-          <span className="profile-db-status__dot" />
-          <span>متصل بقاعدة البيانات المركزية</span>
-        </div>
-      </div>
 
       {/* ── بطاقة رأس الملف الشخصي (Hero Card) ── */}
       <section className="profile-hero">
@@ -265,49 +211,8 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* ── شريط التبويبات (Tabs Navigation) ── */}
-      <nav className="profile-tabs-nav" aria-label="تبويبات الملف الشخصي">
-        <button
-          type="button"
-          className={`profile-tab-btn ${activeTab === 'basic' ? 'is-active' : ''}`}
-          onClick={() => setActiveTab('basic')}
-        >
-          <HiOutlineUser size={18} />
-          <span>البيانات الأساسية والمعلومات الشخصية</span>
-        </button>
-
-        <button
-          type="button"
-          className={`profile-tab-btn ${activeTab === 'security' ? 'is-active' : ''}`}
-          onClick={() => setActiveTab('security')}
-        >
-          <span className="profile-tab-btn__dot" />
-          <HiOutlineShieldCheck size={18} />
-          <span>الأمان والتحقق الوطني (نفاذ)</span>
-        </button>
-
-        <button
-          type="button"
-          className={`profile-tab-btn ${activeTab === 'permissions' ? 'is-active' : ''}`}
-          onClick={() => setActiveTab('permissions')}
-        >
-          <HiOutlineScale size={18} />
-          <span>الأدوار والصلاحيات القضائية</span>
-        </button>
-
-        <button
-          type="button"
-          className={`profile-tab-btn ${activeTab === 'activity' ? 'is-active' : ''}`}
-          onClick={() => setActiveTab('activity')}
-        >
-          <HiOutlineClock size={18} />
-          <span>سجل النشاط والأجهزة</span>
-        </button>
-      </nav>
-
-      {/* ── محتوى التبويب النشط ── */}
-      {activeTab === 'basic' && (
-        <div className="profile-content-grid">
+      {/* ── محتوى الملف الشخصي الرئيسي ── */}
+      <div className="profile-content-grid">
           {/* العمود الأيمن (المعلومات الشخصية والاعتماد القضائي) */}
           <div className="profile-col-main">
             {/* البطاقة الأولى: المعلومات الشخصية والاتصال */}
@@ -317,7 +222,19 @@ export default function ProfilePage() {
                   <span className="profile-panel-card__bullet" />
                   <span>المعلومات الشخصية والاتصال</span>
                 </h2>
-                <span className="profile-panel-card__badge-sub">آخر تعديل: منذ أسبوعين</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span className="profile-panel-card__badge-sub">آخر تعديل: منذ أسبوعين</span>
+                  <button
+                    type="button"
+                    className="btn btn--ghost"
+                    onClick={() => setEditModalOpen(true)}
+                    style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                    title="تعديل المعلومات الشخصية"
+                  >
+                    <HiOutlinePencil size={15} />
+                    <span>تعديل</span>
+                  </button>
+                </div>
               </header>
 
               <div className="profile-fields-grid">
@@ -431,181 +348,60 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+            {/* البطاقة الثالثة: الأدوار والصلاحيات القضائية */}
+            <div className="profile-panel-card">
+              <header className="profile-panel-card__head">
+                <h2 className="profile-panel-card__title">
+                  <span className="profile-panel-card__bullet" />
+                  <span>الأدوار والصلاحيات القضائية</span>
+                </h2>
+                <span className="profile-panel-card__badge-pill">صلاحيات المستشار العام</span>
+              </header>
 
-      {/* ── التبويب الثاني: الأمان والتحقق الوطني ── */}
-      {activeTab === 'security' && (
-        <div className="profile-panel-card">
-          <header className="profile-panel-card__head">
-            <h2 className="profile-panel-card__title">
-              <HiOutlineShieldCheck size={22} color="var(--brand-teal)" />
-              <span>إعدادات الأمان وحماية الدخول المتقدمة (نفاذ & 2FA)</span>
-            </h2>
-            <span className="profile-security-badge-top">مستوى حماية فائق</span>
-          </header>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.25rem' }}>
-              <h3 style={{ margin: '0 0 0.5rem', color: 'var(--brand-teal)', fontSize: '1rem', fontWeight: 800 }}>
-                الربط مع بوابة النفاذ الوطني الموحد (نفاذ)
-              </h3>
-              <p style={{ margin: '0 0 1rem', color: 'var(--text-muted)', fontSize: '0.86rem', lineHeight: 1.6 }}>
-                يتم تسجيل الدخول وتوثيق المعاملات القانونية عبر مصادقة الهوية الرقمية الرسمية باستخدام البصمة الحيوية ورمز التحقق عبر تطبيق «نفاذ».
-              </p>
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <span className="profile-field-item__badge profile-field-item__badge--emerald" style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem' }}>
-                  ✓ الهوية موثقة ونشطة
-                </span>
-                <span className="profile-field-item__badge profile-field-item__badge--teal" style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem' }}>
-                  رقم المرجع بنفاذ: NAF-88234-910
-                </span>
-              </div>
-            </div>
-
-            <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ margin: 0, color: 'var(--brand-teal)', fontSize: '1rem', fontWeight: 800 }}>
-                  كلمة المرور وحماية الحساب
-                </h3>
-                <button
-                  type="button"
-                  className="btn btn--primary"
-                  onClick={() => setPasswordModalOpen(true)}
-                  style={{ height: '36px', fontSize: '0.82rem' }}
-                >
-                  <HiOutlineLockClosed size={16} />
-                  <span>تغيير كلمة المرور</span>
-                </button>
-              </div>
-              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.86rem', lineHeight: 1.6 }}>
-                آخر تحديث لكلمة المرور تم بنجاح. يُوصى بتغيير كلمة المرور كل 90 يوماً واستخدام كلمات مرور قوية لا تقل عن 12 خانة تحتوي على رموز وأرقام.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── التبويب الثالث: الأدوار والصلاحيات القضائية ── */}
-      {activeTab === 'permissions' && (
-        <div className="profile-panel-card">
-          <header className="profile-panel-card__head">
-            <h2 className="profile-panel-card__title">
-              <HiOutlineScale size={22} color="var(--brand-teal)" />
-              <span>الصلاحيات والمهام القضائية المسندة للمستشار</span>
-            </h2>
-            <span className="profile-panel-card__badge-pill">صلاحيات المستشار العام</span>
-          </header>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-            <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
-                <HiOutlineCheckCircle size={18} color="var(--success)" />
-                <span>إدارة القضايا والملفات القضائية</span>
-              </div>
-              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                صلاحية كاملة لإنشاء، تعديل، أرشفة، وإغلاق ملفات الدعاوى أمام المحاكم بكافة درجاتها.
-              </p>
-            </div>
-
-            <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
-                <HiOutlineCheckCircle size={18} color="var(--success)" />
-                <span>إدارة الجلسات وتأجيل المواعيد</span>
-              </div>
-              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                إسناد الجلسات لمحامي المكتب، تأجيل المواعيد، وتدوين المذكرات والمرافعات القضائية.
-              </p>
-            </div>
-
-            <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
-                <HiOutlineCheckCircle size={18} color="var(--success)" />
-                <span>الفواتير والعمليات المالية</span>
-              </div>
-              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                إصدار الفواتير الضريبية، تسجيل سندات القبض، ومتابعة المطالبات المالية للموكلين.
-              </p>
-            </div>
-
-            <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
-                <HiOutlineCheckCircle size={18} color="var(--success)" />
-                <span>إدارة الصلاحيات والمستخدمين</span>
-              </div>
-              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                التحكم بمصفوفة الأدوار، إنشاء حسابات المحامين والموكلين وتعيين الصلاحيات الإدارية.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── التبويب الرابع: سجل النشاط والأجهزة ── */}
-      {activeTab === 'activity' && (
-        <div className="profile-panel-card">
-          <header className="profile-panel-card__head">
-            <h2 className="profile-panel-card__title">
-              <HiOutlineClock size={22} color="var(--brand-teal)" />
-              <span>سجل الجلسات النشطة وتسجيلات الدخول</span>
-            </h2>
-            <button
-              type="button"
-              className="profile-devices-head-btn"
-              onClick={() => setConfirmTerminateAllOpen(true)}
-            >
-              إنهاء جميع الجلسات الأخرى
-            </button>
-          </header>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-            {devices.map((dev) => (
-              <div key={dev.id} className="profile-device-box" style={{ margin: 0 }}>
-                <div className="profile-device-box__icon">
-                  {dev.type === 'desktop' ? (
-                    <HiOutlineDesktopComputer size={22} />
-                  ) : (
-                    <HiOutlineDeviceMobile size={22} />
-                  )}
-                </div>
-                <div className="profile-device-box__info">
-                  <div className="profile-device-box__name-row">
-                    <span className="profile-device-box__name" style={{ fontSize: '0.94rem' }}>
-                      {dev.name}
-                    </span>
-                    {dev.isCurrent ? (
-                      <span className="profile-field-item__badge profile-field-item__badge--emerald">
-                        الجلسة الحالية (هذا الجهاز)
-                      </span>
-                    ) : (
-                      <span className="profile-field-item__badge profile-field-item__badge--slate">
-                        جلسة متصلة
-                      </span>
-                    )}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
+                    <HiOutlineCheckCircle size={18} color="var(--success)" />
+                    <span>إدارة القضايا والملفات القضائية</span>
                   </div>
-                  <span className="profile-device-box__meta">
-                    عنوان IP: {dev.ip} • الموقع الجغرافي: {dev.location}
-                  </span>
-                  <span className="profile-device-box__status">
-                    {dev.isCurrent ? `الحالة الحالية: ${dev.activity}` : `آخر نشاط: ${dev.lastSeen}`}
-                  </span>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    صلاحية كاملة لإنشاء، تعديل، أرشفة، وإغلاق ملفات الدعاوى أمام المحاكم بكافة درجاتها.
+                  </p>
                 </div>
-                {!dev.isCurrent && (
-                  <button
-                    type="button"
-                    className="btn btn--ghost"
-                    style={{ fontSize: '0.78rem', color: 'var(--danger)', borderColor: 'rgba(196,69,69,0.3)', padding: '0.35rem 0.75rem' }}
-                    onClick={() => handleTerminateDevice(dev.id)}
-                  >
-                    إنهاء الجلسة
-                  </button>
-                )}
+
+                <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
+                    <HiOutlineCheckCircle size={18} color="var(--success)" />
+                    <span>إدارة الجلسات وتأجيل المواعيد</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    إسناد الجلسات لمحامي المكتب، تأجيل المواعيد، وتدوين المذكرات والمرافعات القضائية.
+                  </p>
+                </div>
+
+                <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
+                    <HiOutlineCheckCircle size={18} color="var(--success)" />
+                    <span>الفواتير والعمليات المالية</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    إصدار الفواتير الضريبية، تسجيل سندات القبض، ومتابعة المطالبات المالية للموكلين.
+                  </p>
+                </div>
+
+                <div style={{ background: '#f8fafb', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.15rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--brand-teal)', marginBottom: '0.5rem' }}>
+                    <HiOutlineCheckCircle size={18} color="var(--success)" />
+                    <span>إدارة الصلاحيات والمستخدمين</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    التحكم بمصفوفة الأدوار، إنشاء حسابات المحامين والموكلين وتعيين الصلاحيات الإدارية.
+                  </p>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
-      )}
 
       {/* ── Modal تعديل الملف الشخصي ── */}
       <EditProfileModal
@@ -638,20 +434,6 @@ export default function ProfilePage() {
         cancelText="إلغاء التراجع"
         variant="warning"
         icon="logout"
-      />
-
-      {/* ── Modal تأكيد إنهاء جميع الجلسات ── */}
-      <ConfirmModal
-        open={confirmTerminateAllOpen}
-        onClose={() => setConfirmTerminateAllOpen(false)}
-        onConfirm={handleTerminateAll}
-        title="تأكيد إنهاء جميع الجلسات"
-        message="هل أنت متأكد من رغبتك في تسجيل الخروج وإنهاء الاتصال من كافة الأجهزة والمتصفحات الأخرى؟"
-        warning="سيتطلب من أي جهاز آخر إعادة إدخال بيانات الدخول والتحقق الوطني للمتابعة."
-        confirmText="إنهاء جميع الجلسات"
-        cancelText="إلغاء"
-        variant="warning"
-        icon="alert"
       />
     </div>
   )

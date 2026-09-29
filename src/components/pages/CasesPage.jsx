@@ -52,11 +52,12 @@ export default function CasesPage() {
   const { caseCategories } = useCaseCategories()
   const { clients } = useClients()
   const { lawyers } = useLawyers()
-  const { create, remove } = useCaseMutations()
+  const { create, update, remove } = useCaseMutations()
 
   const { showToast } = useToast()
   const [query, setQuery] = useState('')
   const [addOpen, setAddOpen] = useState(false)
+  const [editingCase, setEditingCase] = useState(null)
   const [selectedCase, setSelectedCase] = useState(null)
   const [deletingCase, setDeletingCase] = useState(null)
 
@@ -93,35 +94,47 @@ export default function CasesPage() {
 
   const clearFilters = () => { setQuery(''); resetPage() }
 
-  const handleSave = async (payload, files = []) => {
+  const handleSave = async (payload, files = [], editingId = null) => {
     const companyId = getStoredCompanyId()
     try {
-      const created = await create.mutateAsync({
-        ...payload,
-        ...(companyId != null ? { company_id: companyId } : {}),
-      })
-      const caseId = created?.id || created?.data?.id
-      if (files?.length && caseId) {
-        for (const file of files) {
-          try {
-            const fd = buildDocumentFormData(
-              {
-                description: file.name,
-                fileName: file.name,
-                docType: 'مستند قضية',
-                caseId: String(caseId),
-                file,
-              },
-              { companyId },
-            )
-            await createCaseDocument(fd)
-          } catch {
-            // Document upload failure shouldn't cancel case creation
+      if (editingId) {
+        await update.mutateAsync({
+          id: editingId,
+          values: {
+            ...payload,
+            ...(companyId != null ? { company_id: companyId } : {}),
+          },
+        })
+        showToast('تم تعديل القضية بنجاح')
+      } else {
+        const created = await create.mutateAsync({
+          ...payload,
+          ...(companyId != null ? { company_id: companyId } : {}),
+        })
+        const caseId = created?.id || created?.data?.id
+        if (files?.length && caseId) {
+          for (const file of files) {
+            try {
+              const fd = buildDocumentFormData(
+                {
+                  description: file.name,
+                  fileName: file.name,
+                  docType: 'مستند قضية',
+                  caseId: String(caseId),
+                  file,
+                },
+                { companyId },
+              )
+              await createCaseDocument(fd)
+            } catch {
+              // Document upload failure shouldn't cancel case creation
+            }
           }
         }
+        showToast('تم إضافة القضية بنجاح')
       }
-      showToast('تم إضافة القضية بنجاح')
       setAddOpen(false)
+      setEditingCase(null)
       await refetch()
     } catch (err) {
       showToast(parseApiError(err).message, 'error')
@@ -187,7 +200,10 @@ export default function CasesPage() {
           <button
             type="button"
             className="btn btn--primary"
-            onClick={() => setAddOpen(true)}
+            onClick={() => {
+              setEditingCase(null)
+              setAddOpen(true)
+            }}
           >
             <Icon name="plus" size={18} />
             إضافة قضية
@@ -281,7 +297,10 @@ export default function CasesPage() {
                             className="action-btn action-btn--edit"
                             title="تعديل"
                             aria-label={`تعديل ${item.title}`}
-                            onClick={() => setSelectedCase(item)}
+                            onClick={() => {
+                              setEditingCase(item)
+                              setAddOpen(true)
+                            }}
                           >
                             <Icon name="edit" size={16} />
                           </button>
@@ -312,12 +331,16 @@ export default function CasesPage() {
 
       <AddCaseModal
         open={addOpen}
-        onClose={() => setAddOpen(false)}
+        onClose={() => {
+          setAddOpen(false)
+          setEditingCase(null)
+        }}
         onSave={handleSave}
         caseTypes={caseTypes}
         caseCategories={caseCategories}
         clients={clients}
         lawyers={lawyers}
+        initialData={editingCase}
       />
 
       <CaseDetailsModal
@@ -325,13 +348,13 @@ export default function CasesPage() {
         caseData={
           selectedCase
             ? {
-                ...selectedCase,
-                lawyerName: resolveLawyerName(selectedCase, lawyerNameById),
-                lawyerDetails: {
-                  ...selectedCase.lawyerDetails,
-                  name: resolveLawyerName(selectedCase, lawyerNameById),
-                },
-              }
+              ...selectedCase,
+              lawyerName: resolveLawyerName(selectedCase, lawyerNameById),
+              lawyerDetails: {
+                ...selectedCase.lawyerDetails,
+                name: resolveLawyerName(selectedCase, lawyerNameById),
+              },
+            }
             : null
         }
         onClose={() => setSelectedCase(null)}

@@ -3,6 +3,8 @@ import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { FilterSelect } from '../ui/FilterSelect'
 import { DateField } from '../ui/DateField'
+import { Pagination } from '../ui/Pagination'
+import { usePagination } from '../../hooks/usePagination'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { AppointmentFormModal } from '../appointments/AppointmentFormModal'
 import { AppointmentDetailsModal } from '../appointments/AppointmentDetailsModal'
@@ -133,6 +135,8 @@ export default function AppointmentsPage() {
         .includes(normalized)
     })
   }, [scoped, query, type, status, lawyerId, dateFrom, dateTo, dateRangeInvalid, isAdmin])
+
+  const { page, setPage, paginated, resetPage } = usePagination(filtered)
 
   const editingAppointment =
     appointments.find((item) => item.id === editingId) || null
@@ -270,16 +274,33 @@ export default function AppointmentsPage() {
     setLawyerId('')
     setDateFrom('')
     setDateTo('')
+    resetPage()
   }
 
   return (
     <div className="appointments-page">
       <div className="cases-toolbar appointments-titlebar">
         <h2 className="cases-toolbar__title">المواعيد</h2>
-        <button type="button" className="btn btn--primary" onClick={openNew}>
-          <Icon name="plus" size={18} />
-          حجز موعد
-        </button>
+        <div className="cases-toolbar__actions">
+          <button
+            type="button"
+            className="btn btn--ghost inline-flex items-center gap-2"
+            onClick={() => refetch()}
+            disabled={isLoading || isFetching}
+            title="تحديث"
+          >
+            <HiOutlineRefresh
+              size={18}
+              className={isFetching ? 'animate-spin' : undefined}
+              aria-hidden
+            />
+            تحديث
+          </button>
+          <button type="button" className="btn btn--primary" onClick={openNew}>
+            <Icon name="plus" size={18} />
+            حجز موعد
+          </button>
+        </div>
       </div>
 
 
@@ -422,7 +443,7 @@ export default function AppointmentsPage() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((item) => (
+                paginated.map((item) => (
                   <tr key={item.id}>
                     <td>
                       <span className="appointment-type">
@@ -524,6 +545,11 @@ export default function AppointmentsPage() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          page={page}
+          total={filtered.length}
+          onChange={(p) => setPage(p)}
+        />
       </div>
       ) : null}
 

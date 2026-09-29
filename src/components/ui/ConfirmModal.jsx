@@ -15,6 +15,7 @@ export function ConfirmModal({
   cancelText = 'إلغاء التراجع',
   variant = 'danger', // 'danger' | 'warning' | 'primary' | 'neutral'
   icon = null,
+  confirmDisabled = false,
 }) {
   if (!open) return null
 
@@ -135,13 +136,15 @@ export function ConfirmModal({
             type="button"
             className="btn"
             onClick={onConfirm}
-            disabled={isLoading}
+            disabled={isLoading || confirmDisabled}
             style={{
-              background: confirmBtnBg,
-              borderColor: confirmBtnBg,
+              background: confirmDisabled ? 'var(--text-muted, #94a3b8)' : confirmBtnBg,
+              borderColor: confirmDisabled ? 'var(--text-muted, #94a3b8)' : confirmBtnBg,
               color: '#ffffff',
               minWidth: '120px',
               justifyContent: 'center',
+              cursor: confirmDisabled ? 'not-allowed' : 'pointer',
+              opacity: confirmDisabled ? 0.75 : 1,
             }}
           >
             {isLoading ? (

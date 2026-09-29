@@ -412,5 +412,478 @@ export const apiRules = {
       },
     },
   },
+
+  appointments: {
+    appointment_date: {
+      required: true,
+      type: 'string',
+      pattern: /^\d{4}-\d{2}-\d{2}$/,
+      source: 'API response ("The appointment date field is required.")',
+      messages: {
+        required: 'تاريخ الموعد مطلوب',
+        invalid: 'صيغة التاريخ غير صحيحة (YYYY-MM-DD)',
+      },
+    },
+    appointment_time: {
+      required: true,
+      type: 'string',
+      source: 'API response ("The appointment time field is required.")',
+      messages: {
+        required: 'وقت الموعد مطلوب',
+        invalid: 'صيغة الوقت غير صحيحة',
+      },
+    },
+    appointment_type: {
+      required: true,
+      type: 'enum',
+      allowedValues: ['استشارة', 'اجتماع', 'أخرى'],
+      source: 'API response ("The selected appointment type is invalid.")',
+      messages: {
+        required: 'نوع الموعد مطلوب',
+        invalid: 'نوع الموعد غير صالح',
+      },
+    },
+    status: {
+      required: false,
+      type: 'enum',
+      allowedValues: ['معلق', 'مؤكد', 'قيد الانتظار', 'ملغي', 'غير معين'],
+      source: 'API response ("The selected status is invalid.")',
+      messages: {
+        invalid: 'حالة الموعد غير صالحة',
+      },
+    },
+    client_id: {
+      required: true,
+      type: 'integer',
+      source: 'API requirement in admin portal',
+      messages: {
+        required: 'الموكل مطلوب',
+        invalid: 'الموكل المحدد غير صالح',
+      },
+    },
+    notes: {
+      required: false,
+      max: 1000,
+      type: 'string',
+      messages: {
+        max: 'الملاحظات لا يجب أن تتجاوز 1000 حرف',
+      },
+    },
+  },
+
+  documents: {
+    company_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The company id field is required.")',
+    },
+    title: {
+      required: true,
+      max: 255,
+      type: 'string',
+      source: 'API response ("The title field is required.", "must not be greater than 255 characters.")',
+      messages: {
+        required: 'اسم/عنوان المستند مطلوب',
+        max: 'اسم المستند لا يتجاوز 255 حرفاً',
+      },
+    },
+    file: {
+      required: true,
+      type: 'file',
+      source: 'API response ("The file field is required.", "must be a file.")',
+      messages: {
+        required: 'يرجى اختيار ملف لرفعه',
+        invalid: 'الملف المرفق غير صالح',
+      },
+    },
+    document_type: {
+      required: false,
+      max: 100,
+      type: 'string',
+      source: 'API response ("The document type field must not be greater than 100 characters.")',
+      messages: {
+        max: 'نوع المستند لا يتجاوز 100 حرف',
+      },
+    },
+    case_id: {
+      required: false,
+      type: 'integer',
+      source: 'API response ("The selected case id is invalid.")',
+    },
+    notes: {
+      required: false,
+      type: 'string',
+    },
+    description: {
+      required: false,
+      type: 'string',
+    },
+  },
+
+  invoices: {
+    company_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The company id field is required.")',
+    },
+    invoice_number: {
+      required: true,
+      type: 'string',
+      source: 'API response ("The invoice number field is required.", "The invoice number has already been taken.")',
+      messages: {
+        required: 'رقم الفاتورة مطلوب',
+        unique: 'رقم الفاتورة مسجل مسبقاً',
+      },
+    },
+    client_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The client id field is required.")',
+      messages: {
+        required: 'الموكل مطلوب',
+      },
+    },
+    issue_date: {
+      required: true,
+      type: 'date',
+      source: 'API response ("The issue date field is required.", "must be a valid date.")',
+      messages: {
+        required: 'تاريخ الإصدار مطلوب',
+        invalid: 'تاريخ الإصدار غير صحيح',
+      },
+    },
+    due_date: {
+      required: false,
+      type: 'date',
+      source: 'API response ("must be a valid date.")',
+      messages: {
+        invalid: 'تاريخ الاستحقاق غير صحيح',
+      },
+    },
+    description: {
+      required: true,
+      type: 'string',
+      source: 'API response ("The description field is required.")',
+      messages: {
+        required: 'وصف الفاتورة مطلوب',
+      },
+    },
+    total_amount: {
+      required: true,
+      min: 0,
+      type: 'numeric',
+      source: 'API response ("The total amount field is required.", "must be at least 0.")',
+      messages: {
+        required: 'المبلغ الإجمالي مطلوب',
+        min: 'المبلغ الإجمالي يجب أن يكون صفراً أو أكثر',
+      },
+    },
+    paid_amount: {
+      required: false,
+      min: 0,
+      type: 'numeric',
+      source: 'API response ("The paid amount field must be a number.")',
+      messages: {
+        invalid: 'المبلغ المدفوع يجب أن يكون رقماً',
+      },
+    },
+    status: {
+      required: false,
+      type: 'enum',
+      allowedValues: ['unpaid', 'paid', 'partial', 'cancelled'],
+      source: 'API response ("The selected status is invalid.")',
+      messages: {
+        invalid: 'حالة الفاتورة غير صالحة',
+      },
+    },
+    payment_method: {
+      required: false,
+      type: 'enum',
+      allowedValues: ['cash', 'bank_transfer', 'credit_card', 'other'],
+      source: 'API response ("The selected payment method is invalid.")',
+      messages: {
+        invalid: 'طريقة الدفع غير صالحة',
+      },
+    },
+    case_id: {
+      required: false,
+      type: 'integer',
+    },
+    notes: {
+      required: false,
+      type: 'string',
+    },
+  },
+
+  cases: {
+    company_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The company id field is required.")',
+      messages: {
+        required: 'معرف الشركة مطلوب',
+      },
+    },
+    case_number: {
+      required: true,
+      min: 1,
+      max: 100,
+      type: 'string',
+      source: 'API response ("The case number field is required.", unique)',
+      messages: {
+        required: 'رقم القضية مطلوب',
+        max: 'رقم القضية يجب ألا يتجاوز 100 حرف',
+      },
+    },
+    title: {
+      required: true,
+      min: 2,
+      max: 255,
+      type: 'string',
+      source: 'API response ("The title field is required.")',
+      messages: {
+        required: 'عنوان القضية مطلوب',
+        min: 'عنوان القضية يجب ألا يقل عن حرفين',
+        max: 'عنوان القضية يجب ألا يتجاوز 255 حرفاً',
+      },
+    },
+    type_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The type id field is required.")',
+      messages: {
+        required: 'نوع القضية مطلوب',
+      },
+    },
+    client_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The client id field is required.")',
+      messages: {
+        required: 'الموكل مطلوب',
+      },
+    },
+    lawyer_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The lawyer id field is required.")',
+      messages: {
+        required: 'المحامي المسؤول مطلوب',
+      },
+    },
+    court_name: {
+      required: true,
+      min: 2,
+      max: 255,
+      type: 'string',
+      source: 'API response ("The court name field is required.")',
+      messages: {
+        required: 'اسم المحكمة مطلوب',
+        min: 'اسم المحكمة يجب ألا يقل عن حرفين',
+        max: 'اسم المحكمة يجب ألا يتجاوز 255 حرفاً',
+      },
+    },
+    court_circuit: {
+      required: false,
+      max: 255,
+      type: 'string',
+    },
+    judge_name: {
+      required: false,
+      max: 255,
+      type: 'string',
+    },
+    court_case_number: {
+      required: false,
+      max: 100,
+      type: 'string',
+    },
+    first_session_date: {
+      required: false,
+      type: 'date',
+    },
+    next_session_date: {
+      required: false,
+      type: 'date',
+    },
+    priority: {
+      required: false,
+      type: 'enum',
+      allowedValues: ['low', 'normal', 'high', 'urgent'],
+      source: 'API response ("The selected priority is invalid.")',
+      messages: {
+        invalid: 'مستوى الأولوية غير صالح',
+      },
+    },
+    stage: {
+      required: false,
+      type: 'enum',
+      allowedValues: ['investigation', 'court', 'appeal', 'execution', 'closed'],
+      source: 'API response ("The selected stage is invalid.")',
+      messages: {
+        invalid: 'المرحلة المحددة غير صالحة',
+      },
+    },
+    status: {
+      required: false,
+      type: 'enum',
+      allowedValues: ['active', 'closed', 'pending'],
+      source: 'API response ("The selected status is invalid.")',
+      messages: {
+        invalid: 'حالة القضية غير صالحة',
+      },
+    },
+  },
+
+  case_documents: {
+    company_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The company id field is required.")',
+    },
+    case_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The case id field is required.")',
+    },
+    document_type: {
+      required: false,
+      max: 255,
+      type: 'string',
+    },
+    description: {
+      required: false,
+      type: 'string',
+    },
+    file: {
+      required: true,
+      type: 'file',
+      source: 'API response ("The file field is required.")',
+      messages: {
+        required: 'الملف مطلوب',
+      },
+    },
+  },
+
+  lawyers: {
+    company_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The company id field is required.")',
+    },
+    user_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The user id field is required.")',
+    },
+    full_name: {
+      required: true,
+      min: 2,
+      max: 255,
+      type: 'string',
+      source: 'Users API requirement',
+      messages: {
+        required: 'الاسم الكامل مطلوب',
+        min: 'الاسم الكامل يجب ألا يقل عن حرفين',
+        max: 'الاسم الكامل لا يتجاوز 255 حرفاً',
+      },
+    },
+    email: {
+      required: true,
+      max: 255,
+      type: 'email',
+      source: 'Users API requirement',
+      messages: {
+        required: 'البريد الإلكتروني مطلوب',
+        invalid: 'صيغة البريد الإلكتروني غير صحيحة',
+      },
+    },
+    phone: {
+      required: false,
+      type: 'phone',
+      messages: {
+        invalid: 'صيغة رقم الهاتف غير صحيحة',
+      },
+    },
+    national_id: {
+      required: false,
+      type: 'nationalId',
+      messages: {
+        invalid: 'رقم الهوية غير صحيح (10-14 رقماً)',
+      },
+    },
+    bar_number: {
+      required: false,
+      max: 50,
+      type: 'string',
+      messages: {
+        max: 'رقم القيد لا يتجاوز 50 حرفاً',
+      },
+    },
+    specialization: {
+      required: false,
+      max: 255,
+      type: 'string',
+    },
+    address: {
+      required: false,
+      max: 255,
+      type: 'string',
+    },
+    status: {
+      required: false,
+      type: 'enum',
+      allowedValues: ['active', 'inactive'],
+      messages: {
+        invalid: 'حالة المحامي غير صالحة',
+      },
+    },
+  },
+
+  notifications: {
+    company_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The company id field is required.")',
+    },
+    user_id: {
+      required: true,
+      type: 'integer',
+      source: 'API response ("The user id field is required.")',
+    },
+    title: {
+      required: true,
+      max: 255,
+      type: 'string',
+      source: 'API response ("The title field is required.")',
+      messages: {
+        required: 'عنوان الإشعار مطلوب',
+        max: 'عنوان الإشعار لا يتجاوز 255 حرفاً',
+      },
+    },
+    message: {
+      required: true,
+      type: 'string',
+      source: 'API response ("The message field is required.")',
+      messages: {
+        required: 'نص الإشعار مطلوب',
+      },
+    },
+    type: {
+      required: false,
+      max: 50,
+      type: 'string',
+    },
+    reference_id: {
+      required: false,
+      type: 'integer',
+    },
+    is_read: {
+      required: false,
+      type: 'boolean',
+    },
+  },
 }
+
+
 

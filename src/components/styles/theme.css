@@ -25,9 +25,13 @@
   --success: #2d8a5e;
   --success-bg: #e8f6ef;
   --danger: #c44545;
+  --danger-bg: #fef2f2;
+  --warning: #a8893f;
+  --warning-bg: #f3ead3;
   --info: #3a6ea5;
   --info-bg: #eaf2fa;
 
+  --grad-title: linear-gradient(90deg, var(--brand-teal), var(--brand-gold-dark));
   --grad-gold: linear-gradient(135deg, #e0c878 0%, #c4a35a 45%, #a8893f 100%);
   --grad-teal: linear-gradient(160deg, #2a4f52 0%, #1e3a3c 50%, #152c2e 100%);
   --grad-teal-soft: linear-gradient(135deg, #355c5f 0%, #1e3a3c 100%);

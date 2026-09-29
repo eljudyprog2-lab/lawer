@@ -54,7 +54,7 @@ export function AppointmentFormModal({
   const inputClass = (key) => `input${fieldErrors[key] ? ' is-invalid' : ''}`
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
+    event?.preventDefault?.()
     if (submitting) return
     const clientId = isClient ? lockedClientId || form.clientId : form.clientId
     const validation = validateAppointmentForm(
@@ -92,6 +92,7 @@ export function AppointmentFormModal({
             form="appointment-form"
             className="btn btn--primary"
             disabled={submitting}
+            onClick={handleSubmit}
           >
             {submitting ? 'جاري الحفظ...' : 'حفظ'}
           </button>
@@ -102,6 +103,7 @@ export function AppointmentFormModal({
       }
     >
       <form id="appointment-form" className="appointment-form" onSubmit={handleSubmit} noValidate>
+        <button type="submit" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
         <FormBanner>{banner}</FormBanner>
         <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FieldGrid cols={2}>

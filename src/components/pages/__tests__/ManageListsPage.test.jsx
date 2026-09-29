@@ -66,11 +66,11 @@ describe('Manage Lists Feature Tests', () => {
 
       expect(screen.getByText('مجموعات الخيارات والقوائم المنسدلة')).toBeInTheDocument()
       expect(screen.getByText('إجمالي مجموعات القوائم')).toBeInTheDocument()
-      expect(screen.getByText('قوائم مدعومة بالكامل (CRUD)')).toBeInTheDocument()
+      expect(screen.getByText('قوائم ديناميكية تفاعلية')).toBeInTheDocument()
 
       await waitFor(() => {
-        expect(screen.getByText('أنواع القضايا (Case Types)')).toBeInTheDocument()
-        expect(screen.getByText('تصنيفات ودرجات التقاضي (Case Categories)')).toBeInTheDocument()
+        expect(screen.getByText('أنواع القضايا')).toBeInTheDocument()
+        expect(screen.getByText('تصنيفات ودرجات التقاضي')).toBeInTheDocument()
       })
     })
 
@@ -78,14 +78,14 @@ describe('Manage Lists Feature Tests', () => {
       renderWithProviders(<ManageListsPage />)
 
       await waitFor(() => {
-        expect(screen.getByText('أنواع القضايا (Case Types)')).toBeInTheDocument()
+        expect(screen.getByText('أنواع القضايا')).toBeInTheDocument()
       })
 
       const searchInput = screen.getByPlaceholderText('بحث في مجموعات الخيارات...')
       fireEvent.change(searchInput, { target: { value: 'مدنية' } })
 
-      expect(screen.getByText('أنواع القضايا (Case Types)')).toBeInTheDocument()
-      expect(screen.queryByText('حالات الفواتير والتحصيل (Invoice Statuses)')).not.toBeInTheDocument()
+      expect(screen.getByText('أنواع القضايا')).toBeInTheDocument()
+      expect(screen.queryByText('حالات الفواتير والتحصيل')).not.toBeInTheDocument()
     })
   })
 

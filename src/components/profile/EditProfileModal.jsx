@@ -7,6 +7,7 @@ import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 export function EditProfileModal({ open, onClose, user, onSave, submitting }) {
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     phone: '',
     nationalId: '',
     address: '',
@@ -17,6 +18,7 @@ export function EditProfileModal({ open, onClose, user, onSave, submitting }) {
     if (open && user) {
       setFormData({
         name: user.name || user.full_name || '',
+        email: user.email || '',
         phone: user.phone || '',
         nationalId: user.nationalId || '',
         address: user.address || '',
@@ -39,6 +41,9 @@ export function EditProfileModal({ open, onClose, user, onSave, submitting }) {
   const validate = () => {
     const errs = {}
     if (!formData.name.trim()) errs.name = 'الاسم الكامل مطلوب'
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      errs.email = 'صيغة البريد الإلكتروني غير صحيحة'
+    }
     if (formData.phone && !/^[0-9+ ]{9,16}$/.test(formData.phone.trim())) {
       errs.phone = 'رقم الجوال غير صحيح'
     }
@@ -117,6 +122,18 @@ export function EditProfileModal({ open, onClose, user, onSave, submitting }) {
               />
             </Field>
 
+            <Field label="البريد الإلكتروني المعتمد" error={errors.email}>
+              <input
+                id="profile-email"
+                type="email"
+                className={`input${errors.email ? ' input--error' : ''}`}
+                value={formData.email}
+                onChange={(e) => updateField('email', e.target.value)}
+                placeholder="example@domain.com"
+                dir="ltr"
+              />
+            </Field>
+
             <Field label="رقم الهوية الوطنية">
               <input
                 id="profile-nationalId"
@@ -124,7 +141,7 @@ export function EditProfileModal({ open, onClose, user, onSave, submitting }) {
                 className="input"
                 value={formData.nationalId}
                 onChange={(e) => setFormData((p) => ({ ...p, nationalId: e.target.value }))}
-                placeholder="10XXXXXXXX"
+                placeholder="رقم الهوية المكون من 10 أرقام"
                 maxLength={10}
                 dir="ltr"
               />

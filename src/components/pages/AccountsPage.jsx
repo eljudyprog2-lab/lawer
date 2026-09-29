@@ -1,12 +1,15 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
+import { StatCard } from '../dashboard/StatCard'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { useUsers, useUserMutations } from '../../hooks/useUsers'
 import { UserFormModal } from '../users/UserFormModal'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { ConfirmModal } from '../ui/ConfirmModal'
+import { Pagination } from '../ui/Pagination'
+import { usePagination } from '../../hooks/usePagination'
 import { parseApiError } from '../../api/client'
 
 export default function AccountsPage() {
@@ -59,6 +62,8 @@ export default function AccountsPage() {
       return true
     })
   }, [users, activeTab, searchQuery])
+
+  const { page, setPage, paginated, resetPage } = usePagination(filteredUsers)
 
   // Save User (Create or Update) via Real API
   const handleSaveUser = async (payload) => {
@@ -130,15 +135,7 @@ export default function AccountsPage() {
       {/* ── رأس الصفحة (Top Bar) ── */}
       <header className="mgmt-topbar">
         <div className="mgmt-topbar__title-wrap">
-          <div className="mgmt-topbar__icon">
-            <Icon name="users" size={22} />
-          </div>
-          <div>
-            <h1 className="mgmt-topbar__title">إدارة الحسابات والمستخدمين</h1>
-            <p className="mgmt-topbar__subtitle">
-              إنشاء وإدارة حسابات المحامين والموكلين وتعيين الصلاحيات والأدوار
-            </p>
-          </div>
+          <h1 className="mgmt-topbar__title">إدارة الحسابات والمستخدمين</h1>
         </div>
 
         <div className="mgmt-topbar__actions">
@@ -230,62 +227,35 @@ export default function AccountsPage() {
       </section>
 
       {/* ── بطاقات الإحصائيات الأربع (Stats Grid) ── */}
-      <section className="mgmt-stats-grid" aria-label="إحصائيات الحسابات">
-        {/* إجمالي الحسابات */}
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val">{totalCount}</div>
-            <div className="mgmt-stat-card__label">إجمالي الحسابات المسجلة</div>
-            <div className="mgmt-stat-card__sub" style={{ color: 'var(--success)' }}>
-              حسابات حية بقاعدة البيانات
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--amber">
-            <Icon name="users" size={22} />
-          </div>
-        </div>
-
-        {/* حسابات المحامين */}
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val">{lawyersCount}</div>
-            <div className="mgmt-stat-card__label">حسابات المحامين</div>
-            <div className="mgmt-stat-card__sub" style={{ color: 'var(--brand-gold)' }}>
-              ممارس ومستشار
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--amber">
-            <Icon name="sessions" size={22} />
-          </div>
-        </div>
-
-        {/* حسابات الموكلين */}
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val">{clientsCount}</div>
-            <div className="mgmt-stat-card__label">الموظفين والمساعدين</div>
-            <div className="mgmt-stat-card__sub" style={{ color: 'var(--info)' }}>
-              سكرتارية وإدارة
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--blue">
-            <Icon name="user" size={22} />
-          </div>
-        </div>
-
-        {/* حسابات الإدارة */}
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val">{adminCount}</div>
-            <div className="mgmt-stat-card__label">حسابات الإدارة والملاك</div>
-            <div className="mgmt-stat-card__sub" style={{ color: 'var(--brand-teal)' }}>
-              صلاحيات تحكم كاملة
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--purple">
-            <Icon name="shield" size={22} />
-          </div>
-        </div>
+      <section className="stats-grid" aria-label="إحصائيات الحسابات">
+        <StatCard
+          value={totalCount}
+          label="إجمالي الحسابات المسجلة"
+          tone="gold"
+          icon="users"
+          index={0}
+        />
+        <StatCard
+          value={lawyersCount}
+          label="حسابات المحامين"
+          tone="teal"
+          icon="sessions"
+          index={1}
+        />
+        <StatCard
+          value={clientsCount}
+          label="الموظفين والمساعدين"
+          tone="muted"
+          icon="user"
+          index={2}
+        />
+        <StatCard
+          value={adminCount}
+          label="حسابات الإدارة والملاك"
+          tone="success"
+          icon="shield"
+          index={3}
+        />
       </section>
 
       {/* ── جدول الحسابات والمستخدمين المسجلين ── */}
@@ -356,7 +326,7 @@ export default function AccountsPage() {
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((u) => {
+                paginated.map((u) => {
                   const roleBadgeClass =
                     u.role === 'owner'
                       ? 'mgmt-role-tag--superadmin'
@@ -450,6 +420,13 @@ export default function AccountsPage() {
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          page={page}
+          total={filteredUsers.length}
+          perPage={10}
+          onChange={(p) => setPage(p)}
+        />
 
         <footer className="mgmt-table-card__footer">
           <div>إجمالي الحسابات المطابقة: {filteredUsers.length}</div>

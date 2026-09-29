@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
-import { FormSection, Field, FieldGrid, FormBanner } from '../ui/Form'
+import { FormSection, Field, FieldGrid } from '../ui/Form'
 import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
@@ -10,6 +10,7 @@ import {
   casePriorityUiOptions,
   caseStageUiOptions,
   caseStatusUiOptions,
+  caseToForm,
   emptyCaseForm,
   parseApiError,
   validateCaseForm,
@@ -20,10 +21,25 @@ import { mapApiFieldErrors } from '../../utils/validation'
 const CASE_API_FIELD_MAP = {
   case_number: 'number',
   case_type_id: 'type',
+  type_id: 'type',
   client_id: 'client',
   lawyer_id: 'lawyer',
   court_name: 'courtName',
+  court_circuit: 'circuit',
+  judge_name: 'judgeName',
+  court_case_number: 'courtCaseNumber',
+  first_session_date: 'firstSession',
   next_session_date: 'nextSession',
+  incident_date: 'incidentDate',
+  power_of_attorney_date: 'powerOfAttorneyDate',
+  limitation_date: 'limitationExpiry',
+  judgement_deadline: 'judgmentDeadline',
+  priority: 'priority',
+  stage: 'stage',
+  status: 'status',
+  description: 'description',
+  internal_notes: 'internalNotes',
+  required_documents: 'requiredDocuments',
 }
 
 export function AddCaseModal({
@@ -34,8 +50,9 @@ export function AddCaseModal({
   caseCategories = [],
   clients = [],
   lawyers = [],
+  initialData = null,
 }) {
-  const [form, setForm] = useState(() => ({ ...emptyCaseForm }))
+  const [form, setForm] = useState(() => (initialData ? caseToForm(initialData) : { ...emptyCaseForm }))
   const [filesLabel, setFilesLabel] = useState('لم يتم اختيار ملف')
   const [submitting, setSubmitting] = useState(false)
   const [fieldErrors, setFieldErrors] = useState({})
@@ -50,7 +67,7 @@ export function AddCaseModal({
   const inputClass = (key) => `input${fieldErrors[key] ? ' is-invalid' : ''}`
 
   const reset = () => {
-    setForm({ ...emptyCaseForm })
+    setForm(initialData ? caseToForm(initialData) : { ...emptyCaseForm })
     setFilesLabel('لم يتم اختيار ملف')
     setSubmitting(false)
     setFieldErrors({})
@@ -59,13 +76,13 @@ export function AddCaseModal({
 
   useEffect(() => {
     if (open) {
-      setForm({ ...emptyCaseForm })
+      setForm(initialData ? caseToForm(initialData) : { ...emptyCaseForm })
       setFilesLabel('لم يتم اختيار ملف')
       setSubmitting(false)
       setFieldErrors({})
       setBanner('')
     }
-  }, [open])
+  }, [open, initialData])
 
   const handleClose = () => {
     reset()
@@ -84,7 +101,11 @@ export function AddCaseModal({
     setBanner('')
     setSubmitting(true)
     try {
-      await onSave(buildCasePayload(form, { companyId: getStoredCompanyId() }), form.files || [])
+      await onSave(
+        buildCasePayload(form, { companyId: getStoredCompanyId() }),
+        form.files || [],
+        initialData?.id,
+      )
       reset()
     } catch (err) {
       const parsed = parseApiError(err)
@@ -99,7 +120,7 @@ export function AddCaseModal({
   return (
     <Modal
       open={open}
-      title="إضافة قضية جديدة"
+      title={initialData ? 'تعديل قضية' : 'إضافة قضية جديدة'}
       onClose={handleClose}
       wide
       footer={
@@ -109,8 +130,9 @@ export function AddCaseModal({
             form="add-case-form"
             className="btn btn--primary"
             disabled={submitting}
+            onClick={handleSubmit}
           >
-            {submitting ? 'جاري الحفظ...' : 'حفظ'}
+            {submitting ? 'جاري الحفظ...' : initialData ? 'حفظ التعديلات' : 'حفظ'}
           </button>
           <button type="button" className="btn btn--ghost" onClick={handleClose}>
             إلغاء
@@ -118,9 +140,8 @@ export function AddCaseModal({
         </>
       }
     >
-      <form id="add-case-form" className="case-form" onSubmit={handleSubmit}>
-        <FormBanner>{banner}</FormBanner>
-        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
+      <form id="add-case-form" className="case-form" onSubmit={handleSubmit} noValidate>
+        <button type="submit" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
         <FormSection icon={<Icon name="info" />} title="المعلومات الأساسية">
           <FieldGrid>
             <Field label="رقم القضية" required error={fieldErrors.number}>
@@ -194,12 +215,22 @@ export function AddCaseModal({
                 placeholder="اسم القاضي المسؤول"
               />
             </Field>
-            <Field label="رقم الدعوى بالمحكمة">
+            <Field label="رقم الدعوى بالمحكمة" error={fieldErrors.courtCaseNumber}>
               <input
-                className="input"
+                className={inputClass('courtCaseNumber')}
                 value={form.courtCaseNumber}
-                onChange={set('courtCaseNumber')}
-                placeholder="رقم القضية في المحكمة"
+                onChange={(e) => {
+                  const val = e.target.value
+                  set('courtCaseNumber')(e)
+                  if (val && /[^\d\u0660-\u0669\s/-]/.test(val)) {
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      courtCaseNumber: 'رقم الدعوى بالمحكمة يجب أن يتكون من أرقام فقط',
+                    }))
+                  }
+                }}
+                placeholder="رقم القضية في المحكمة (أرقام فقط)"
+                inputMode="numeric"
               />
             </Field>
             <Field label="تاريخ أول جلسة">
@@ -347,7 +378,7 @@ export function AddCaseModal({
                 aria-label="تاريخ الواقعة"
               />
             </Field>
-            <Field label="تاريخ التوكيل">
+            <Field label="تاريخ التوكيل" error={fieldErrors.powerOfAttorneyDate}>
               <DateField
                 value={form.powerOfAttorneyDate}
                 onChange={(value) => set('powerOfAttorneyDate')({ target: { value } })}
@@ -405,6 +436,8 @@ export function AddCaseModal({
             </Field>
           </FieldGrid>
         </FormSection>
+
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
       </form>
     </Modal>
   )

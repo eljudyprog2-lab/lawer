@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Modal } from '../ui/Modal'
-import { FormSection, Field, FieldGrid, FormBanner } from '../ui/Form'
+import { FormSection, Field, FieldGrid } from '../ui/Form'
 import { ValidationSummaryBox } from '../ui/ValidationSummaryBox'
 import { Icon } from '../ui/Icon'
 import { DateField } from '../ui/DateField'
@@ -34,10 +34,10 @@ export function InvoiceFormModal({ open, invoice, onClose, onSave }) {
       invoice
         ? invoiceToForm(invoice)
         : {
-            ...emptyInvoiceForm,
-            number: generateInvoiceNumber(),
-            issueDate: new Date().toISOString().slice(0, 10),
-          },
+          ...emptyInvoiceForm,
+          number: generateInvoiceNumber(),
+          issueDate: new Date().toISOString().slice(0, 10),
+        },
     )
   }, [open, invoice])
 
@@ -119,8 +119,9 @@ export function InvoiceFormModal({ open, invoice, onClose, onSave }) {
             form="invoice-form"
             className="btn btn--primary"
             disabled={submitting || clientsLoading || casesLoading}
+            onClick={handleSubmit}
           >
-            حفظ
+            {submitting ? 'جاري الحفظ...' : 'حفظ'}
           </button>
           <button type="button" className="btn btn--ghost" onClick={onClose}>
             إلغاء
@@ -129,8 +130,6 @@ export function InvoiceFormModal({ open, invoice, onClose, onSave }) {
       }
     >
       <form id="invoice-form" className="case-form" onSubmit={handleSubmit} noValidate>
-        <FormBanner>{banner}</FormBanner>
-        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
         <FormSection icon={<Icon name="invoices" />} title="معلومات الفاتورة">
           <FieldGrid cols={2}>
             <Field label="رقم الفاتورة" required>
@@ -313,6 +312,7 @@ export function InvoiceFormModal({ open, invoice, onClose, onSave }) {
             </Field>
           </FieldGrid>
         </FormSection>
+        <ValidationSummaryBox errors={{ ...fieldErrors, banner }} />
       </form>
     </Modal>
   )

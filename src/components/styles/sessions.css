@@ -37,7 +37,7 @@
 
 .sessions-topbar__row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
@@ -64,7 +64,11 @@
   margin: 0;
   font-size: 1.45rem;
   font-weight: 800;
-  color: var(--text-h);
+  background: linear-gradient(90deg, var(--brand-teal), var(--brand-gold-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .sessions-subtitle {

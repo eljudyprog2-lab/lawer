@@ -27,15 +27,25 @@ export const invoiceStatusOptions = [
 
 export const paymentMethodOptions = [
   { value: 'cash', label: 'نقدي' },
-  { value: 'check', label: 'شيك' },
   { value: 'bank_transfer', label: 'تحويل بنكي' },
-  { value: 'card', label: 'بطاقة' },
+  { value: 'credit_card', label: 'بطاقة ائتمان' },
+  { value: 'other', label: 'أخرى' },
 ]
 
 const STATUS_LABELS = Object.fromEntries(invoiceStatusOptions.map((o) => [o.value, o.label]))
-const STATUS_VALUES = Object.fromEntries(invoiceStatusOptions.map((o) => [o.label, o.value]))
+const STATUS_VALUES = {
+  ...Object.fromEntries(invoiceStatusOptions.map((o) => [o.label, o.value])),
+  ...Object.fromEntries(invoiceStatusOptions.map((o) => [o.value, o.value])),
+}
 const METHOD_LABELS = Object.fromEntries(paymentMethodOptions.map((o) => [o.value, o.label]))
-const METHOD_VALUES = Object.fromEntries(paymentMethodOptions.map((o) => [o.label, o.value]))
+const METHOD_VALUES = {
+  ...Object.fromEntries(paymentMethodOptions.map((o) => [o.label, o.value])),
+  ...Object.fromEntries(paymentMethodOptions.map((o) => [o.value, o.value])),
+  'بطاقة': 'credit_card',
+  'شيك': 'other',
+  'check': 'other',
+  'card': 'credit_card',
+}
 
 export function invoiceStatusLabel(status) {
   return STATUS_LABELS[status] || status || '—'
@@ -152,15 +162,18 @@ export function remaining(invoice) {
 }
 
 export function buildInvoicePayload(form, { companyId } = {}) {
+  const total = Number(form.total) || 0
+  const paid = Number(form.paid) || 0
   const payload = {
-    invoice_number: form.number || undefined,
+    invoice_number: form.number || generateInvoiceNumber(),
     client_id: form.clientId ? Number(form.clientId) || form.clientId : null,
     case_id: form.caseId ? Number(form.caseId) || form.caseId : null,
     issue_date: form.issueDate,
     due_date: form.dueDate || null,
     description: form.description?.trim?.() ?? form.description ?? '',
-    total_amount: Number(form.total) || 0,
-    paid_amount: Number(form.paid) || 0,
+    total_amount: total,
+    paid_amount: paid,
+    remaining_amount: Math.max(0, total - paid),
     status: STATUS_VALUES[form.status] || form.statusRaw || form.status || 'unpaid',
     payment_method:
       METHOD_VALUES[form.paymentMethod] || form.paymentMethodRaw || form.paymentMethod || null,
@@ -274,7 +287,7 @@ export function validateInvoiceForm(form) {
   }
   if (!trimStr(form.issueDate)) fieldErrors.issueDate = MSG.required
   if (!isValidDateOrder(form.issueDate, form.dueDate)) {
-    fieldErrors.dueDate = MSG.dateOrder
+    fieldErrors.dueDate = 'تاريخ الإصدار يجب أن يكون قبل تاريخ الاستحقاق أو يساويه'
   }
   return validationResult(fieldErrors)
 }

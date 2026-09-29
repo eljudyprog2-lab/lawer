@@ -3,22 +3,31 @@ import { HiOutlineExclamationCircle, HiOutlineRefresh } from 'react-icons/hi'
 import { Icon } from '../ui/Icon'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { useNotifications, useNotificationMutations } from '../../hooks/useNotifications'
+import { useToast } from '../../context/ToastContext'
+import { parseApiError } from '../../api/notifications'
 
 export default function NotificationsPage() {
   const { notifications, unreadCount, isLoading, error, refetch } = useNotifications()
   const { markRead, remove } = useNotificationMutations()
+  const { showToast } = useToast()
   const [deletingNotification, setDeletingNotification] = useState(null)
 
   const markAllRead = async () => {
     const unread = notifications.filter((item) => !item.read)
-    await Promise.allSettled(unread.map((item) => markRead.mutateAsync(item.id)))
+    try {
+      await Promise.allSettled(unread.map((item) => markRead.mutateAsync(item.id)))
+      showToast('تم تحديد جميع الإشعارات كمقروءة')
+    } catch (err) {
+      showToast(parseApiError(err).message, 'error')
+    }
   }
 
   const removeOne = async (id) => {
     try {
       await remove.mutateAsync(id)
-    } catch {
-      /* toast handled via error state on refetch if needed */
+      showToast('تم حذف الإشعار بنجاح')
+    } catch (err) {
+      showToast(parseApiError(err).message, 'error')
     }
   }
 

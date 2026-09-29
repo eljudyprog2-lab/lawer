@@ -7,20 +7,38 @@
  *  - perPage: items per page (default 10)
  *  - onChange(newPage): called when the user changes the page
  */
-export function Pagination({ page, total, perPage = 10, onChange }) {
-  const totalPages = Math.ceil(total / perPage)
+export function Pagination({
+  page: pageProp,
+  currentPage,
+  total: totalProp,
+  totalPages: totalPagesProp,
+  perPage = 10,
+  onChange,
+  onPageChange,
+}) {
+  const page = Number(pageProp ?? currentPage ?? 1)
+  const changeHandler = onChange || onPageChange || (() => {})
+
+  const totalPages =
+    totalPagesProp !== undefined
+      ? Number(totalPagesProp)
+      : totalProp !== undefined
+        ? Math.ceil(Number(totalProp) / perPage)
+        : 1
+
   if (totalPages <= 1) return null
 
   // Build visible page numbers with ellipsis
   const pages = buildPages(page, totalPages)
 
+  const effectiveTotal = totalProp !== undefined ? Number(totalProp) : totalPages * perPage
   const start = (page - 1) * perPage + 1
-  const end = Math.min(page * perPage, total)
+  const end = Math.min(page * perPage, effectiveTotal)
 
   return (
     <div className="pagination-bar">
       <span className="pagination-bar__info">
-        {start}–{end} من {total}
+        {start}–{end} من {effectiveTotal}
       </span>
 
       <nav className="pagination-nav" aria-label="ترقيم الصفحات" dir="ltr">
@@ -28,7 +46,7 @@ export function Pagination({ page, total, perPage = 10, onChange }) {
         <button
           type="button"
           className="pg-btn pg-btn--nav"
-          onClick={() => onChange(page - 1)}
+          onClick={() => changeHandler(page - 1)}
           disabled={page <= 1}
           aria-label="الصفحة السابقة"
         >
@@ -45,7 +63,7 @@ export function Pagination({ page, total, perPage = 10, onChange }) {
               key={p}
               type="button"
               className={`pg-btn${p === page ? ' pg-btn--active' : ''}`}
-              onClick={() => p !== page && onChange(p)}
+              onClick={() => p !== page && changeHandler(p)}
               aria-label={`صفحة ${p}`}
               aria-current={p === page ? 'page' : undefined}
             >
@@ -58,7 +76,7 @@ export function Pagination({ page, total, perPage = 10, onChange }) {
         <button
           type="button"
           className="pg-btn pg-btn--nav"
-          onClick={() => onChange(page + 1)}
+          onClick={() => changeHandler(page + 1)}
           disabled={page >= totalPages}
           aria-label="الصفحة التالية"
         >

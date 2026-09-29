@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Icon } from '../ui/Icon'
+import { Pagination } from '../ui/Pagination'
 import { ConfirmDeleteModal } from '../ui/ConfirmDeleteModal'
 import { AddEventModal } from './AddEventModal'
 import { UploadDocumentModal } from './UploadDocumentModal'
@@ -89,6 +90,7 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
   const [docOpen, setDocOpen] = useState(false)
   const [events, setEvents] = useState([])
   const [documents, setDocuments] = useState([])
+  const [docPage, setDocPage] = useState(1)
   const [docsLoading, setDocsLoading] = useState(false)
   const [docError, setDocError] = useState(null)
   const [deletingDoc, setDeletingDoc] = useState(null)
@@ -442,46 +444,55 @@ export function CaseDetailsModal({ open, caseData, onClose, onUpdate, readOnly =
                   <p>لا توجد مستندات مرفوعة</p>
                 </div>
               ) : (
-                <div className="docs-list">
-                  {documents.map((doc) => (
-                    <article key={doc.id} className="doc-item">
-                      <div className="doc-item__icon">
-                        <Icon name="folder" />
-                      </div>
-                      <div className="doc-item__body">
-                        <h4>{doc.name}</h4>
-                        <div className="doc-item__meta">
-                          <span>{doc.type}</span>
-                          <span>{doc.fileName}</span>
-                          <span>{doc.uploadedAt}</span>
+                <>
+                  <div className="docs-list">
+                    {documents.slice((docPage - 1) * 10, docPage * 10).map((doc) => (
+                      <article key={doc.id} className="doc-item">
+                        <div className="doc-item__icon">
+                          <Icon name="folder" />
                         </div>
-                        {doc.notes ? <p>{doc.notes}</p> : null}
-                      </div>
-                      <div className="doc-item__actions">
-                        <button
-                          type="button"
-                          className="action-btn action-btn--download"
-                          title="تحميل"
-                          aria-label={`تحميل ${doc.fileName || doc.name}`}
-                          onClick={() => handleDownloadDoc(doc)}
-                        >
-                          <Icon name="download" size={16} />
-                        </button>
-                        {!readOnly ? (
+                        <div className="doc-item__body">
+                          <h4>{doc.name}</h4>
+                          <div className="doc-item__meta">
+                            <span>{doc.type}</span>
+                            <span>{doc.fileName}</span>
+                            <span>{doc.uploadedAt}</span>
+                          </div>
+                          {doc.notes ? <p>{doc.notes}</p> : null}
+                        </div>
+                        <div className="doc-item__actions">
                           <button
                             type="button"
-                            className="action-btn action-btn--delete"
-                            title="مسح المستند"
-                            aria-label={`مسح ${doc.fileName || doc.name}`}
-                            onClick={() => setDeletingDoc(doc)}
+                            className="action-btn action-btn--download"
+                            title="تحميل"
+                            aria-label={`تحميل ${doc.fileName || doc.name}`}
+                            onClick={() => handleDownloadDoc(doc)}
                           >
-                            <Icon name="trash" size={16} />
+                            <Icon name="download" size={16} />
                           </button>
-                        ) : null}
-                      </div>
-                    </article>
-                  ))}
-                </div>
+                          {!readOnly ? (
+                            <button
+                              type="button"
+                              className="action-btn action-btn--delete"
+                              title="مسح المستند"
+                              aria-label={`مسح ${doc.fileName || doc.name}`}
+                              onClick={() => setDeletingDoc(doc)}
+                            >
+                              <Icon name="trash" size={16} />
+                            </button>
+                          ) : null}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+
+                  <Pagination
+                    page={docPage}
+                    total={documents.length}
+                    perPage={10}
+                    onChange={setDocPage}
+                  />
+                </>
               )}
             </div>
           )}

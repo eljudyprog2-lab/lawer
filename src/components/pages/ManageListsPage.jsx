@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
+import { StatCard } from '../dashboard/StatCard'
 import { useLookupOverview } from '../../hooks/useLookups'
 import { useToast } from '../../context/ToastContext'
 
@@ -41,18 +42,7 @@ export default function ManageListsPage() {
       {/* ── Breadcrumb & Top Bar ── */}
       <div className="mgmt-topbar">
         <div className="mgmt-topbar__title-wrap">
-          <div className="mgmt-topbar__icon">
-            <Icon name="tag" size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: '0.2rem' }}>
-              <span>إدارة النظام</span> &gt; <span>إدارة القوائم والخيارات (Manage Lists)</span>
-            </div>
-            <h1 className="mgmt-topbar__title">مجموعات الخيارات والقوائم المنسدلة</h1>
-            <p className="mgmt-topbar__subtitle">
-              تخصيص وإدارة القوائم المنسدلة وخيارات النظام الأساسية (أنواع القضايا، التصنيفات، الحالات الإجرائية، وأنواع المستندات)
-            </p>
-          </div>
+          <h1 className="mgmt-topbar__title">مجموعات الخيارات والقوائم المنسدلة</h1>
         </div>
 
         <div className="mgmt-topbar__actions">
@@ -95,62 +85,37 @@ export default function ManageListsPage() {
         </div>
       ) : null}
 
-      {/* ── Summary Stats Grid (Top row from Stitch) ── */}
-      <div className="mgmt-stats-grid">
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val">{groups.length}</div>
-            <div className="mgmt-stat-card__label">إجمالي مجموعات القوائم</div>
-            <div className="mgmt-stat-card__sub" style={{ color: '#0d9488' }}>
-              موزعة عبر وحدات النظام
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--teal">
-            <Icon name="tag" size={22} />
-          </div>
-        </div>
-
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val">{totalRegisteredOptions}</div>
-            <div className="mgmt-stat-card__label">إجمالي خيارات النظام</div>
-            <div className="mgmt-stat-card__sub" style={{ color: '#2563eb' }}>
-              خيارات مسجلة ونظامية
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--blue">
-            <Icon name="cases" size={22} />
-          </div>
-        </div>
-
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val">{managedApiGroupsCount}</div>
-            <div className="mgmt-stat-card__label">قوائم مدعومة بالكامل (CRUD)</div>
-            <div className="mgmt-stat-card__sub" style={{ color: '#d97706' }}>
-              أنواع وتصنيفات القضايا
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--amber">
-            <Icon name="shield" size={22} />
-          </div>
-        </div>
-
-        <div className="mgmt-stat-card">
-          <div>
-            <div className="mgmt-stat-card__val" style={{ fontSize: '1.25rem', marginTop: '0.35rem' }}>
-              متطابقة ومستقرة
-            </div>
-            <div className="mgmt-stat-card__label">حالة الربط والـ API</div>
-            <div className="mgmt-stat-card__sub" style={{ color: '#059669' }}>
-              متصل بالواجهة الخلفية
-            </div>
-          </div>
-          <div className="mgmt-stat-card__icon mgmt-stat-card__icon--green">
-            <Icon name="check" size={22} />
-          </div>
-        </div>
-      </div>
+      {/* ── Summary Stats Grid ── */}
+      <section className="stats-grid" aria-label="إحصائيات القوائم">
+        <StatCard
+          value={groups.length}
+          label="إجمالي مجموعات القوائم"
+          tone="gold"
+          icon="tag"
+          index={0}
+        />
+        <StatCard
+          value={totalRegisteredOptions}
+          label="إجمالي خيارات النظام"
+          tone="teal"
+          icon="cases"
+          index={1}
+        />
+        <StatCard
+          value={managedApiGroupsCount}
+          label="قوائم ديناميكية تفاعلية"
+          tone="muted"
+          icon="shield"
+          index={2}
+        />
+        <StatCard
+          value="متطابقة ومستقرة"
+          label="حالة الربط البرمجي"
+          tone="success"
+          icon="check"
+          index={3}
+        />
+      </section>
 
       {/* ── Table & Filter Card ── */}
       <div className="mgmt-table-card">
@@ -253,7 +218,7 @@ export default function ManageListsPage() {
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
                             <span style={{ fontWeight: 800, fontSize: '0.94rem', color: '#0f172a' }}>
-                              {group.name} ({group.englishName})
+                              {group.name}
                             </span>
                             <span className="mgmt-code-badge">{group.code}</span>
                           </div>

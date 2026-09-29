@@ -63,8 +63,8 @@ export function DeleteOptionModal({
             <div style={{ fontWeight: 800, color: '#0f172a', marginTop: '0.15rem' }}>{option.name}</div>
           </div>
           <div>
-            <span style={{ color: '#64748b' }}>المعرف البرمجي (ID):</span>
-            <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#475569', marginTop: '0.15rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>المعرف الرقمي للسجل:</span>
+            <div style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)', marginTop: '0.15rem' }}>
               #{option.id}
             </div>
           </div>
@@ -92,8 +92,25 @@ export function DeleteOptionModal({
               {referenceInfo.cases.length > 0 ? (
                 <> (مثل: {referenceInfo.cases.slice(0, 2).map((c) => c.case_number || c.title).join('، ')})</>
               ) : null}.
-              قد يؤدي حذفه إلى منع العملية من جانب خادم قاعدة البيانات لحماية سلامة البيانات.
+              لا يمكن حذف هذا الخيار لارتباطه بقضايا نشطة، لحماية سلامة السجلات في قاعدة البيانات.
             </p>
+            <div
+              style={{
+                marginTop: '0.25rem',
+                padding: '0.5rem 0.75rem',
+                background: '#fef3c7',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
+                color: '#78350f',
+                border: '1px solid #fde68a',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+              }}
+            >
+              <Icon name="info" size={14} />
+              <span>لحذف هذا الخيار: يُرجى تعديل تلك القضايا واختيار تصنيف أو نوع آخر أولاً لفك الارتباط.</span>
+            </div>
           </div>
         ) : (
           <div
@@ -137,19 +154,27 @@ export function DeleteOptionModal({
             type="button"
             className="btn"
             onClick={() => onConfirm(option.id)}
-            disabled={isLoading}
+            disabled={isLoading || referenceInfo.isReferenced}
+            title={referenceInfo.isReferenced ? 'الحذف غير متاح لوجود قضايا مرتبطة بهذا الخيار' : 'تأكيد الحذف النهائي'}
             style={{
-              background: 'var(--danger, #c44545)',
-              borderColor: 'var(--danger, #c44545)',
+              background: referenceInfo.isReferenced ? 'var(--text-muted, #94a3b8)' : 'var(--danger, #c44545)',
+              borderColor: referenceInfo.isReferenced ? 'var(--text-muted, #94a3b8)' : 'var(--danger, #c44545)',
               color: '#ffffff',
-              minWidth: '120px',
+              minWidth: '140px',
               justifyContent: 'center',
+              cursor: referenceInfo.isReferenced ? 'not-allowed' : 'pointer',
+              opacity: referenceInfo.isReferenced ? 0.75 : 1,
             }}
           >
             {isLoading ? (
               <>
                 <Icon name="refresh" size={16} className="animate-spin" />
                 جاري الحذف...
+              </>
+            ) : referenceInfo.isReferenced ? (
+              <>
+                <Icon name="lock" size={16} />
+                الحذف غير متاح (مرتبط بسجلات)
               </>
             ) : (
               <>

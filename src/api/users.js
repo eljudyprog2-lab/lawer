@@ -1,4 +1,5 @@
 import { apiClient, extractList, extractItem, parseApiError, getStoredCompanyId } from './client'
+import { translateRole, translateStatus } from '../utils/translations'
 
 export { parseApiError }
 
@@ -115,11 +116,11 @@ export async function registerUserViaApi(form, { companyId } = {}) {
     name: fullName,
     email: user.email || payload.email,
     phone: user.phone || payload.phone || '',
-    role: API_ROLE_LABELS[apiRole] || apiRole,
+    role: translateRole(apiRole, 'المستشار العام'),
     roleId,
-    status: user.status === 'active' ? 'نشط' : (user.status || 'نشط'),
+    status: translateStatus(user.status, 'نشط'),
     company_id: user.company_id || payload.company_id,
-    company_name: user.company?.name || 'Law Office',
+    company_name: user.company?.name || 'مكتب المحاماة',
     initials: String(fullName)
       .split(/\s+/)
       .filter(Boolean)

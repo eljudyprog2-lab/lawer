@@ -42,22 +42,22 @@ export function SessionFormModal({
     setForm(
       session
         ? {
-            caseId: String(session.caseId || ''),
-            sessionNumber: session.sessionNumber,
-            date: session.date,
-            time: session.time,
-            type: session.type,
-            court: session.court,
-            circuit: session.circuit,
-            judge: session.judge,
-            hall: session.hall,
-            courtAddress: session.courtAddress,
-            notes: session.notes,
-            importance: session.importance,
-            status: session.status,
-            decision: session.decision,
-            lawyerId: String(session.lawyerId || ''),
-          }
+          caseId: String(session.caseId || ''),
+          sessionNumber: session.sessionNumber,
+          date: session.date,
+          time: session.time,
+          type: session.type,
+          court: session.court,
+          circuit: session.circuit,
+          judge: session.judge,
+          hall: session.hall,
+          courtAddress: session.courtAddress,
+          notes: session.notes,
+          importance: session.importance,
+          status: session.status,
+          decision: session.decision,
+          lawyerId: String(session.lawyerId || ''),
+        }
         : emptySessionForm,
     )
   }, [open, session])
@@ -90,7 +90,7 @@ export function SessionFormModal({
     <Modal
       open={open}
       title={isEdit ? 'تعديل الجلسة' : 'إضافة جلسة قضائية'}
-      onClose={submitting ? () => {} : onClose}
+      onClose={submitting ? () => { } : onClose}
       wide
       footer={
         <>

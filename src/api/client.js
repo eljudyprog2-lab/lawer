@@ -91,8 +91,10 @@ apiClient.interceptors.response.use(
   },
 )
 
+import { translateApiErrorMessage } from '../utils/translations'
+
 /**
- * Normalize Laravel / Axios errors into a UI-friendly shape.
+ * Normalize Laravel / Axios errors into a UI-friendly shape in pure Arabic.
  */
 export function parseApiError(error) {
   const data = error?.response?.data
@@ -100,7 +102,8 @@ export function parseApiError(error) {
 
   if (data?.errors && typeof data.errors === 'object') {
     for (const [key, value] of Object.entries(data.errors)) {
-      fieldErrors[key] = Array.isArray(value) ? value[0] : String(value)
+      const rawMsg = Array.isArray(value) ? value[0] : String(value)
+      fieldErrors[key] = translateApiErrorMessage(rawMsg)
     }
   }
 
@@ -134,7 +137,14 @@ export function parseApiError(error) {
   } else if (status === 500 && /SQLSTATE.*1366|Incorrect string value/i.test(message)) {
     message =
       'خطأ في قاعدة بيانات الخادم: جدول المستخدمين لا يدعم الحروف العربية في الاسم حالياً (SQL 1366). يُرجى إدخال الاسم بأحرف لاتينية مؤقتاً لحين تعديل ترميز الجدول على الخادم.'
+  } else if (
+    /foreign key constraint|integrity constraint violation|cannot delete.*parent row|1451/i.test(message)
+  ) {
+    message =
+      'لا يمكن حذف هذا العنصر لوجود بيانات وسجلات أخرى مرتبطة به في النظام (مثل القضايا أو الجلسات). يُرجى فك الارتباط أولاً.'
   }
+
+  message = translateApiErrorMessage(message)
 
   return { message, fieldErrors, status }
 }

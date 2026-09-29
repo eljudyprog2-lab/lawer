@@ -1,5 +1,6 @@
 import { apiClient, extractList, extractItem, parseApiError } from './client'
 import { formatFileSize, toDateInputValue } from '../utils/formatDisplay'
+import { validationResult, MSG } from '../utils/validation'
 
 export { parseApiError, formatFileSize }
 
@@ -212,3 +213,25 @@ export const emptyDocumentForm = {
   mimeType: '',
   file: null,
 }
+
+export function validateDocumentForm(form) {
+  const fieldErrors = {}
+  const title = (form.title || form.description || form.fileName || '').trim()
+  if (!title) {
+    fieldErrors.description = 'اسم أو وصف المستند مطلوب'
+  } else if (title.length > 255) {
+    fieldErrors.description = 'اسم المستند لا يتجاوز 255 حرفاً'
+  }
+
+  const hasFiles = form.file || (form.files && form.files.length > 0)
+  if (!hasFiles) {
+    fieldErrors.file = 'يرجى اختيار ملف لرفعه'
+  }
+
+  if (form.docType && form.docType.length > 100) {
+    fieldErrors.docType = 'نوع المستند لا يتجاوز 100 حرف'
+  }
+
+  return validationResult(fieldErrors)
+}
+

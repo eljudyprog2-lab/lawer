@@ -185,6 +185,16 @@ export default function SessionsPage() {
     return calcSessionStats(scopedSessions)
   }, [kpiData, scopedSessions])
 
+  const remoteCount = useMemo(() => {
+    return scopedSessions.filter(
+      (item) =>
+        item.hall?.includes('ناجز') ||
+        item.hall?.includes('عن بعد') ||
+        item.courtAddress?.includes('ناجز') ||
+        item.type === 'مرافعة',
+    ).length
+  }, [scopedSessions])
+
   const todayKey = useMemo(() => new Date().toISOString().slice(0, 10), [])
 
   const dateRangeInvalid = useMemo(
@@ -388,44 +398,35 @@ export default function SessionsPage() {
 
   return (
     <div className="sessions-page">
-      {/* ── الرأس العلوي ومسار التصفح (Top Breadcrumb & Actions) ── */}
+      {/* ── الرأس العلوي (Top Header & Actions) ── */}
       <header className="sessions-topbar">
-        <div className="sessions-topbar__meta">
-          <div className="sessions-breadcrumb">
-            <span>لوحة التحكم</span>
-            <span className="sep">&gt;</span>
-            <span style={{ color: 'var(--brand-teal)', fontWeight: 700 }}>الجلسات القضائية</span>
-            <span className="sep">&gt;</span>
-            <span>اتصال آمن ببوابة العدل</span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }} />
-            <span>نظام ناجز والربط العدلي متصل ومحدث</span>
-          </div>
-        </div>
-
         <div className="sessions-topbar__row">
           <div>
-            <div className="sessions-cat-badge">
-              <span className="sessions-cat-dot" />
-              <span>سجل الترافع والتقويم العدلي</span>
-            </div>
             <h1 className="sessions-title">إدارة الجلسات ومواعيد المحاكم</h1>
             {/* Accessible heading for smoke test compatibility */}
             <h2 style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
               الجلسات
             </h2>
-            <p className="sessions-subtitle">
-              متابعة دقيقة لجدول الترافع الحضوري والإلكتروني المرتبط ببوابة ناجز وديوان المظالم
-            </p>
           </div>
 
           <div className="sessions-topbar__actions">
-            <span className="sessions-sync-pill" title="حالة المزامنة العدلية">
-              <Icon name="refresh" size={14} />
-              <span>محدث تلقائياً مع ناجز قبل 5 دقائق</span>
-            </span>
+            <button
+              type="button"
+              className="btn btn--ghost inline-flex items-center gap-2"
+              onClick={async () => {
+                await refetch()
+                showToast('تم تحديث بيانات الجلسات بنجاح')
+              }}
+              disabled={isLoading || isFetching}
+              title="تحديث البيانات"
+            >
+              <HiOutlineRefresh
+                size={18}
+                className={isFetching ? 'animate-spin' : undefined}
+                aria-hidden
+              />
+              <span>تحديث</span>
+            </button>
 
             <button
               type="button"
@@ -456,40 +457,30 @@ export default function SessionsPage() {
       <section className="stats-grid" aria-label="إحصائيات الجلسات">
         <StatCard
           value={stats.total}
-          label="إجمالي الجلسات النشطة"
+          label="إجمالي الجلسات"
           tone="gold"
           icon="sessions"
-          trend="+12% عن الشهر السابق"
-          sub="موزعة على 6 محاكم عامة وتجارية"
-          badge="ترافع فعّال"
           index={0}
         />
         <StatCard
-          value={stats.today < 10 ? `0${stats.today}` : stats.today}
-          label="جلسات اليوم الحرجة"
+          value={stats.today}
+          label="جلسات اليوم"
           tone="danger"
-          badgeTone="danger"
           icon="clock"
-          badge="مرافعة وحكم"
-          sub="أقرب جلسة: 10:00 ص (الرياض) بعد ساعتين"
           index={1}
         />
         <StatCard
-          value={stats.upcoming < 10 ? `0${stats.upcoming}` : stats.upcoming}
-          label="الجلسات القادمة (7 أيام)"
+          value={stats.upcoming}
+          label="الجلسات القادمة"
           tone="teal"
           icon="calendar"
-          badge="6 مذكرات جاهزة"
-          sub="8 عن بُعد • 6 حضورية — مرتبطة بالتكاليف"
           index={2}
         />
         <StatCard
-          value={stats.postponed < 10 ? `0${stats.postponed}` : stats.postponed}
-          label="جلسات مؤجلة / معلقة"
+          value={stats.postponed}
+          label="الجلسات المؤجلة"
           tone="muted"
           icon="refresh"
-          badge="بطلب الدائرة القضائية"
-          sub="تتطلب تقديم طلب إلكتروني — منصة القرارات"
           index={3}
         />
       </section>
@@ -502,7 +493,7 @@ export default function SessionsPage() {
             { id: 'today', label: 'اليوم', count: stats.today },
             { id: 'week', label: 'هذا الأسبوع', count: stats.upcoming },
             { id: 'upcoming', label: 'القادمة', count: stats.upcoming },
-            { id: 'remote', label: 'عن بُعد - ناجز', count: Math.min(stats.total, 21) },
+            { id: 'remote', label: 'عن بُعد', count: remoteCount },
             { id: 'postponed', label: 'مؤجلة', count: stats.postponed },
           ].map((item) => (
             <button
@@ -941,16 +932,6 @@ export default function SessionsPage() {
           </div>
 
           <div className="sessions-calendar__nav">
-            <button
-              type="button"
-              className="btn btn--ghost"
-              onClick={() => showToast('تمت مزامنة مواعيد الجلسات بنجاح مع Google و Outlook')}
-              title="تزامن مع Google / Outlook"
-            >
-              <Icon name="link" size={15} />
-              <span>تزامن مع Google / Outlook</span>
-            </button>
-
             <button
               type="button"
               className="btn btn--ghost"

@@ -46,15 +46,15 @@ const ROLE_ID_TO_MATRIX_COL = {
  * for the role's matrix column.  If ANY of the listed keys is true → the tab is visible.
  */
 const NAV_TO_MATRIX_KEYS = {
-  cases:        ['cases_view', 'cases_create', 'cases_delete'],
-  sessions:     ['sessions_view', 'sessions_manage'],
+  cases: ['cases_view', 'cases_create', 'cases_delete'],
+  sessions: ['sessions_view', 'sessions_manage'],
   appointments: ['appointments_view', 'appointments_manage'],
-  documents:    ['docs_upload', 'docs_approve'],
-  lawyers:      ['lawyers_view', 'lawyers_manage'],
-  clients:      ['clients_view', 'clients_manage'],
-  invoices:     ['invoices_issue', 'invoices_reports'],
+  documents: ['docs_upload', 'docs_approve'],
+  lawyers: ['lawyers_view', 'lawyers_manage'],
+  clients: ['clients_view', 'clients_manage'],
+  invoices: ['invoices_issue', 'invoices_reports'],
   'manage-lists': ['lists_manage'],
-  accounts:     ['users_manage'],
+  accounts: ['users_manage'],
 }
 
 /** Nav items that are ALWAYS admin-only regardless of matrix */

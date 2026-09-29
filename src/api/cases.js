@@ -60,19 +60,21 @@ export async function deleteCase(id) {
   return data
 }
 
-const STAGE_LABELS = Object.fromEntries(
-  [
-    ['investigation', 'تحقيق'],
-    ['court', 'مرافعة'],
-    ['judgement', 'حجز للحكم'],
-    ['appeal', 'استئناف'],
-    ['execution', 'تنفيذ'],
-    ['closed', 'مغلقة'],
-  ].map(([value, label]) => [value, label]),
-)
-const STAGE_VALUES = Object.fromEntries(
-  Object.entries(STAGE_LABELS).map(([value, label]) => [label, value]),
-)
+const STAGE_LABELS = {
+  investigation: 'تحقيق',
+  court: 'مرافعة',
+  appeal: 'استئناف',
+  execution: 'تنفيذ',
+  closed: 'مغلقة',
+}
+const STAGE_VALUES = {
+  تحقيق: 'investigation',
+  مرافعة: 'court',
+  'حجز للحكم': 'court',
+  استئناف: 'appeal',
+  تنفيذ: 'execution',
+  مغلقة: 'closed',
+}
 
 const PRIORITY_LABELS = {
   urgent: 'عاجل',
@@ -85,19 +87,19 @@ const PRIORITY_VALUES = {
   مرتفع: 'high',
   عالي: 'high',
   عادي: 'normal',
+  متوسط: 'normal',
   منخفض: 'low',
 }
 
 const STATUS_UI = {
   active: 'نشطة',
   pending: 'قيد',
-  postponed: 'مؤجل',
   closed: 'منتهي',
 }
 const STATUS_VALUES = {
   نشطة: 'active',
   قيد: 'pending',
-  مؤجل: 'postponed',
+  مؤجل: 'pending',
   منتهي: 'closed',
 }
 
@@ -378,11 +380,17 @@ export function validateCaseForm(form) {
   if (!requireText(courtName, { min: 2, max: 255 })) {
     fieldErrors.courtName = courtName ? MSG.minLen(2) : 'اسم المحكمة مطلوب'
   }
+  if (form.courtCaseNumber) {
+    const ccn = trimStr(form.courtCaseNumber)
+    if (/[^\d\u0660-\u0669\s/-]/.test(ccn)) {
+      fieldErrors.courtCaseNumber = 'رقم الدعوى بالمحكمة يجب أن يتكون من أرقام فقط'
+    }
+  }
   if (!isValidDateOrder(form.firstSession, form.nextSession)) {
-    fieldErrors.nextSession = MSG.dateOrder
+    fieldErrors.nextSession = 'تاريخ أول جلسة يجب أن يكون قبل تاريخ الجلسة القادمة أو يساويه'
   }
   if (!isValidDateOrder(form.incidentDate, form.powerOfAttorneyDate)) {
-    fieldErrors.powerOfAttorneyDate = MSG.dateOrder
+    fieldErrors.powerOfAttorneyDate = 'تاريخ الواقعة يجب أن يكون قبل تاريخ التوكيل أو يساويه'
   }
 
   return validationResult(fieldErrors)

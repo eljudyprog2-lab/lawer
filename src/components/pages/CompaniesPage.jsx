@@ -11,6 +11,8 @@ import { CompanyDetailsModal } from '../companies/CompanyDetailsModal'
 import { CompanyDeleteModal } from '../companies/CompanyDeleteModal'
 import { SaaSMetricsCards } from '../companies/SaaSMetricsCards'
 import { CompanyLogo, PlanBadge, StatusBadge } from '../companies/CompanyBadges'
+import { Pagination } from '../ui/Pagination'
+import { usePagination } from '../../hooks/usePagination'
 import {
   computeTenantMetrics,
   formatDisplayDate,
@@ -70,6 +72,8 @@ export default function CompaniesPage() {
     })
   }, [companies, query, planFilter, statusFilter])
 
+  const { page, setPage, paginated, resetPage } = usePagination(filtered)
+
   const openAdd = () => {
     setFormMode('add')
     setEditingCompany(null)
@@ -103,9 +107,6 @@ export default function CompaniesPage() {
       <div className="cases-toolbar">
         <div>
           <h2 className="cases-toolbar__title">إدارة المكاتب المستأجرة</h2>
-          <p className="mt-1 text-sm text-[#6b7f80]">
-            إدارة شركات المحاماة واشتراكاتها على مستوى المنصة
-          </p>
         </div>
         <div className="cases-toolbar__actions">
           <button
@@ -133,7 +134,7 @@ export default function CompaniesPage() {
 
 
       {/* Filters */}
-      <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[#d5e0e0] bg-white p-3 shadow-[0_8px_24px_rgba(30,58,60,0.06)] sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="search-field w-full sm:max-w-xs">
           <Icon name="search" className="search-field__icon" />
           <input
@@ -242,7 +243,7 @@ export default function CompaniesPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((item) => (
+                  paginated.map((item) => (
                     <tr key={item.id}>
                       <td>
                         <div className="flex min-w-0 items-center gap-3">
@@ -322,13 +323,20 @@ export default function CompaniesPage() {
             </table>
           </div>
 
-          {filtered.length > 0 ? (
+          {filtered.length > 0 && filtered.length <= 10 ? (
             <div className="flex items-center justify-between border-t border-[#d5e0e0] px-4 py-3 text-xs text-[#6b7f80]">
               <span>
                 عرض {filtered.length} من أصل {companies.length} مكتب
               </span>
             </div>
           ) : null}
+
+          <Pagination
+            page={page}
+            total={filtered.length}
+            perPage={10}
+            onChange={(p) => setPage(p)}
+          />
         </div>
       ) : null}
 

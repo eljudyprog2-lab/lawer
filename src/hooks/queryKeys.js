@@ -36,3 +36,15 @@ export const dashboardKeys = {
   all: ['dashboard'],
   stats: () => ['dashboard', 'stats'],
 }
+
+export const jobRoleKeys = entityKeys('jobRoles')
+export const userJobRoleKeys = entityKeys('userJobRoles')
+
+export const permissionKeys = {
+  all: ['permissions'],
+  dashboard: () => ['permissions', 'dashboard'],
+  list: () => ['permissions', 'list'],
+  matrix: () => ['permissions', 'matrix'],
+  userPermissions: (userId) => ['permissions', 'user', userId],
+  auditLogs: (params = {}) => ['permissions', 'auditLogs', params],
+}

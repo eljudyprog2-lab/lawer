@@ -33,12 +33,14 @@ export const companyStatusOptions = [
   { value: 'expired', label: STATUS_LABELS.expired },
 ]
 
+import { translatePlan, translateStatus } from '../utils/translations'
+
 export function planLabel(plan) {
-  return PLAN_LABELS[plan] || plan || '—'
+  return translatePlan(plan, 'أساسي')
 }
 
 export function statusLabel(status) {
-  return STATUS_LABELS[status] || status || '—'
+  return translateStatus(status, 'نشط')
 }
 
 /**
